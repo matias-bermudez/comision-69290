@@ -12,14 +12,14 @@ const jugador2 = {
     mano: false
 };
 
+let muestra = "";
+
 let mazo = [
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12], 
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12],
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12],
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12]
             ];
-
-let muestra = "";
 
 const reiniciarBaraja = (arr) => {
     arr.length = 0;
@@ -29,14 +29,35 @@ const reiniciarBaraja = (arr) => {
     arr.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
 }
 
+//Son la cantidad de espacios que hay en el contorno de cada tipo de palo.
+const traduccionPalo = (palo) => {
+    switch (palo) {
+        case 0: 
+            return 'O';
+        break;
+        case 1: 
+            return 'C';
+        break;
+        case 2:
+            return 'E';
+        break;
+        case 3: 
+            return 'B';
+        break;
+    }
+}
+
+//Retorna valor del 0 al 3. 
 const getPaloRandom = () => {
     return Math.floor(Math.random() * 4);
 }
 
+//Retorna valor del 0 al 9 de forma aleatoria. (1 al 7 y de 10 al 12 en cuanto a las cartas)
 const getNumeroRandom = () => {
     return Math.floor(Math.random() * 10);
 }
 
+//Obtiene una carta no repartida anteriormente.
 const getCombinacionValida = (baraja) => {
     let palo;
     let nro;
@@ -52,32 +73,17 @@ const getCombinacionValida = (baraja) => {
     return { palo, nro };
 }
 
+// Reparte 1 carta a jugador.
 const repartirCarta = (jugador, baraja) => {
-    let cartasRepartidas = 0;
-    while (cartasRepartidas < 1) {
-        let { palo, nro } = getCombinacionValida(baraja);
-        switch (palo) {
-            case 0: 
-                jugador.cartas.push('O-' + nro);
-                jugador.cartas.shift();
-            break;
-            case 1: 
-                jugador.cartas.push('C-' + nro);
-                jugador.cartas.shift();
-            break;
-            case 2: 
-                jugador.cartas.push('E-' + nro);
-                jugador.cartas.shift();
-            break;
-            case 3: 
-                jugador.cartas.push('B-' + nro);
-                jugador.cartas.shift();
-            break;
-        }
-        cartasRepartidas++;
-    }
+    let { palo, nro } = getCombinacionValida(baraja);
+    palo = traduccionPalo(palo);
+    jugador.cartas.push(palo + '-' + nro);
+    jugador.cartas.shift();
+    cartasRepartidas++;
 }
 
+
+// Reparte 1 carta a cada jugador hasta tener 3 c/u. Retorna 
 const barajarRepartir = (jugador1, jugador2, baraja) => {
     if (jugador1.mano) {
         for (let i = 1; i <= 6; i++ ) {
