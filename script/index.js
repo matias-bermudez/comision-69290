@@ -1,3 +1,4 @@
+console.log("¡Bienvenido a Truco Uruguayo!");
 let nickJ1 = prompt("Ingrese nombre del JUGADOR 1");
 let nickJ2 = prompt("Ingrese nombre del JUGADOR 2")
 while (nickJ1 === null) {
@@ -170,6 +171,6 @@ const jugarMano = (jugador1, jugador2, muestra) => {
 reiniciarMazo(mazo);
 muestra = barajarRepartir(jugador1, jugador2, mazo);
 jugarMano(jugador1, jugador2, muestra);
-
+reiniciarMazo(mazo);
 console.log("¡Buen partido!");
 
