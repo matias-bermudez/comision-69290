@@ -1,10 +1,11 @@
 console.log("¡Bienvenido a Truco Uruguayo!");
+alert("Ahora va el prompt del jugador 1");
+
 let nickJ1 = prompt("Ingrese nombre del JUGADOR 1");
 let nickJ2 = prompt("Ingrese nombre del JUGADOR 2")
 while (nickJ1 === null) {
     nickJ1 = prompt("Ingrese nombre del JUGADOR 1")
 }
-
 while (nickJ2 === null) {
     nickJ2 = prompt("Ingrese nombre del JUGADOR 2")
 }
@@ -14,16 +15,27 @@ const jugador1 = {
     puntos: 0,
     cartas: ["vacio", "vacio", "vacio"],
     mano: true,
+    puntosPartido: 0,
 };
 
 const jugador2 = {
     nick: nickJ2,
-    puntos: 0,
+    puntosMano: 0,
     cartas: ["vacio", "vacio", "vacio"],
-    mano: false
+    mano: false,
+    puntosPartido: 0,
 };
 
 let muestra = "";
+
+class Carta {
+    static id = 0;
+    constructor (palo, numero) {
+        this.id = Carta.id++;
+        this.palo = palo,
+        this.numero = numero;
+    }
+}
 
 let mazo = [
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12], 
@@ -40,20 +52,29 @@ const reiniciarMazo = (arr) => {
     arr.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
 }
 
+const reiniciarMano = (jugador1, jugador2) => {
+    jugador1.cartas.length = 0;
+    jugador2.cartas.length = 0;
+    for (let i = 1; i <= 3; i++) {
+        jugador1.cartas.push("");
+        jugador2.cartas.push("");
+    }
+}
+
 //La asignacion esta justificada por la cantidad de espacios que tiene cada carta en sus contorno.
 const traduccionPalo = (palo) => {
     switch (palo) {
         case 0: 
-            return 'O';
+            return 'Oro';
         break;
         case 1: 
-            return 'C';
+            return 'Caballo';
         break;
         case 2:
-            return 'E';
+            return 'Espada';
         break;
         case 3: 
-            return 'B';
+            return 'Basto';
         break;
     }
 }
@@ -71,23 +92,32 @@ const getNumeroRandom = () => {
 //Obtiene una carta no repartida anteriormente.
 const getCombinacionValida = (baraja) => {
     let palo;
-    let nro;
+    let numero;
     do {
         palo = getPaloRandom();
-        nro = getNumeroRandom();
-    } while (baraja[palo][nro] === -1);
-    baraja[palo][nro] = -1;
-    if (nro < 7) {
-        nro ++;
-    }   else nro += 3;
+        numero = getNumeroRandom();
+    } while (baraja[palo][numero] === -1);
+    baraja[palo][numero] = -1;
+    if (numero < 7) {
+        numero ++;
+    }   else numero += 3;
     palo = traduccionPalo(palo);
-    return (palo + '-' + nro);
+    return new Carta(palo, numero);
 }
 
 // Reparte una carta a un jugador.
 const repartirCarta = (jugador, baraja) => {
     jugador.cartas.push(getCombinacionValida(baraja));
     jugador.cartas.shift();
+}
+
+const irAlMazo = (jugador1, jugador2) => {
+    console.log(jugador1.nick+ ": Me voy al mazo");
+    reiniciarMano(jugador1, jugador2);
+}
+
+const stringCarta = (carta) => {
+    return carta.numero + " de " + carta.palo;
 }
 
 // Reparte 1 carta a cada jugador hasta tener 3 cartas c/u. Retorna la muestra.
@@ -103,8 +133,7 @@ const barajarRepartir = (jugador1, jugador2, baraja) => {
             repartirCarta(jugador2, baraja);
         }
     }
-    let paloMuestra = getCombinacionValida(mazo);
-    return paloMuestra;
+    return getCombinacionValida(mazo);
 }
 
 //Funcion que selecciona la carta a jugar por jugador.
@@ -113,11 +142,11 @@ const jugarCarta = (jugador) => {
     console.log("Selecciona 0: Me voy al mazo");
     let contador = 1;
     for (let carta of jugador.cartas) {
-        console.log("Selecciona " + contador + ": Jugar " + carta);
+        console.log("Selecciona " + contador + ": Jugar " + stringCarta(carta));
         contador++
     }
     let opcion = parseInt(prompt("Seleccione jugada."));
-    while (opcion < 0 || opcion > 3 || isNaN(opcion)) {
+    while (opcion < 0 || opcion > jugador.cartas.length || isNaN(opcion)) {
         opcion = parseInt(prompt("Seleccione jugada valida"));
     }
     console.log("");
@@ -130,21 +159,25 @@ const jugarMano = (jugador1, jugador2, muestra) => {
     let jugadaJ1 = 1;
     let jugadaJ2 = 1;
     let cantIteraciones = 1;
-    console.log("La muestra es: " + muestra);
+    console.log("La muestra es: " + muestra.numero + " de " + muestra.palo);
     //let valores = generarValores(muestra);
     if(jugador1.mano) {
         while( (jugadaJ1 !== 0) && (cantIteraciones <= 3) ) {
             jugadaJ2 = jugarCarta(jugador2);
             if (jugadaJ2 === 0) {
-                console.log(jugador2.nick+ ": Me voy al mazo");
+                irAlMazo(jugador2, jugador1);
                 break;
             } else {
-                console.log("La carta jugada por " + jugador2.nick + " es " + jugador2.cartas[jugadaJ2 -1]);
+                console.log("La carta jugada por " + jugador2.nick + " es " + stringCarta(jugador2.cartas[jugadaJ2 - 1]));
+                console.log("");
+                jugador2.cartas.splice(jugadaJ2 - 1, 1);
                 jugadaJ1 = jugarCarta(jugador1);
                 if (jugadaJ1 === 0) {
-                    console.log(jugador1.nick + ": Me voy al mazo");
+                    irAlMazo(jugador1, jugador2);
                 } else {
-                    console.log("La carta jugada por " + jugador1.nick + " es " + jugador1.cartas[jugadaJ1 -1]);
+                    console.log("La carta jugada por " + jugador1.nick + " es " + stringCarta(jugador1.cartas[jugadaJ1 - 1]));
+                    console.log("");
+                    jugador1.cartas.splice(jugadaJ1 - 1, 1);
                 }
             }
             cantIteraciones++;
@@ -153,19 +186,26 @@ const jugarMano = (jugador1, jugador2, muestra) => {
         while( (jugadaJ2 !== 0) && (cantIteraciones <= 3) ) {
             jugadaJ1 = jugarCarta(jugador1);
             if (jugadaJ1 === 0) {
-                console.log(jugador1.nick + ": Me voy al mazo");
+                irAlMazo(jugador1, jugador2);
                 break;
             } else {
-                console.log("La carta jugada por " + jugador1.nick + "es " + jugador1.cartas[jugadaJ1 -1]);
+                console.log("La carta jugada por " + jugador1.nick + "es " + stringCarta(jugador1.cartas[jugadaJ1 - 1]));
+                console.log("");
+                jugador1.cartas.splice(jugadaJ1 - 1, 1);
                 jugadaJ2 = jugarCarta(jugador2);
                 if (jugadaJ2 === 0) {
-                    console.log(jugador2.nick + ": Me voy al mazo");
+                    irAlMazo(jugador2, jugador1);
                 } else {
-                    console.log("La carta jugada por " + jugador2.nick + "es " + jugador2.cartas[jugadaJ2 -1]);
+                    console.log("La carta jugada por " + jugador2.nick + "es " + stringCarta(jugador2.cartas[jugadaJ2 - 1]));
+                    console.log("");
+                    jugador2.cartas.splice(jugadaJ2 - 1, 1);
                 }
             }
             cantIteraciones++;
         }
+    }
+    if (!((jugadaJ2 === 0) || (jugadaJ1 === 0))) {
+        reiniciarMano(jugador1, jugador2);
     }
 }
 reiniciarMazo(mazo);
