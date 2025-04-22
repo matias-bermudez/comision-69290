@@ -35,6 +35,88 @@ class Carta {
         this.palo = palo,
         this.numero = numero;
     }
+    getPalo = () => {
+        return this.palo;
+    }
+    getNumero = () => {
+        return this.numero;
+    }
+}
+
+//La asignacion esta justificada por la cantidad de espacios que tiene cada carta en sus contorno.
+const traduccionPalo = (palo) => {
+    switch (palo) {
+        case 0: 
+            return 'Oro';
+        break;
+        case 1: 
+            return 'Copa';
+        break;
+        case 2:
+            return 'Espada';
+        break;
+        case 3: 
+            return 'Basto';
+        break;
+    }
+}
+//Ayuda a acceder al valor correcto en la matriz "valores".
+const traduccionPaloInverso = (palo) => {
+    switch (palo) {
+        case 'Oro': 
+            return 0;
+        break;
+        case 'Copa': 
+            return 1;
+        break;
+        case 'Espada':
+            return 2;
+        break;
+        case 'Basto': 
+            return 3;
+        break;
+    }
+}
+//Ayuda a acceder al valor correcto en la matriz "valores".
+const traduccionNumero = (numero) => {
+    if ( numero <= 7) {
+        return numero - 1;
+    } else {
+        return numero - 3;
+    }
+}
+
+let valores = [
+            [8, 9, 10, 1, 2, 3, 4, 5, 6, 7], 
+            [8, 9, 10, 1, 2, 3, 4, 5, 6, 7],
+            [8, 9, 10, 1, 2, 3, 4, 5, 6, 7],
+            [8, 9, 10, 1, 2, 3, 4, 5, 6, 7]
+            ];
+
+const valoresConMuestra = (muestra, valores) => {
+    const palo = traduccionPaloInverso(muestra.getPalo());
+    const numero = muestra.getNumero();
+    valores[palo][traduccionNumero(2)] = 19;
+    valores[palo][traduccionNumero(4)] = 18;
+    valores[palo][traduccionNumero(5)] = 17;
+    valores[palo][traduccionNumero(11)] = 16;
+    valores[palo][traduccionNumero(10)] = 15;
+    if ((numero == 2) || (numero == 4) || (numero == 5) || (numero == 10) || (numero == 11)) {
+        switch (palo) {
+            case 0:
+                valores[0][traduccionNumero(12)] = valores[0][traduccionNumero(numero)];
+                break;
+            case 1:
+                valores[1][traduccionNumero(12)] = valores[1][traduccionNumero(numero)];
+                break;
+            case 2:
+                valores[2][traduccionNumero(12)] = valores[2][traduccionNumero(numero)];
+                break;
+            case 3:
+                valores[3][traduccionNumero(12)] = valores[3][traduccionNumero(numero)];
+                break;
+        }
+    }
 }
 
 let mazo = [
@@ -58,24 +140,6 @@ const reiniciarMano = (jugador1, jugador2) => {
     for (let i = 1; i <= 3; i++) {
         jugador1.cartas.push("");
         jugador2.cartas.push("");
-    }
-}
-
-//La asignacion esta justificada por la cantidad de espacios que tiene cada carta en sus contorno.
-const traduccionPalo = (palo) => {
-    switch (palo) {
-        case 0: 
-            return 'Oro';
-        break;
-        case 1: 
-            return 'Caballo';
-        break;
-        case 2:
-            return 'Espada';
-        break;
-        case 3: 
-            return 'Basto';
-        break;
     }
 }
 
@@ -208,9 +272,15 @@ const jugarMano = (jugador1, jugador2, muestra) => {
         reiniciarMano(jugador1, jugador2);
     }
 }
-reiniciarMazo(mazo);
+/*reiniciarMazo(mazo);
 muestra = barajarRepartir(jugador1, jugador2, mazo);
 jugarMano(jugador1, jugador2, muestra);
-reiniciarMazo(mazo);
-console.log("¡Buen partido!");
+reiniciarMazo(mazo); */
+
+const muestraTest = new Carta('Oro', 6);
+valoresConMuestra(muestraTest, valores);
+if ((valores[0][traduccionNumero(4)]) > (valores[0][traduccionNumero(2)])) {
+    console.log("hola");
+}
+//console.log("¡Buen partido!"); 
 
