@@ -1,6 +1,4 @@
 console.log("¡Bienvenido a Truco Uruguayo!");
-alert("Ahora va el prompt del jugador 1");
-
 let nickJ1 = prompt("Ingrese nombre del JUGADOR 1");
 let nickJ2 = prompt("Ingrese nombre del JUGADOR 2")
 while (nickJ1 === null) {
@@ -26,8 +24,6 @@ const jugador2 = {
     puntosPartido: 0,
 };
 
-let muestra = "";
-
 class Carta {
     static id = 0;
     constructor (palo, numero) {
@@ -42,6 +38,8 @@ class Carta {
         return this.numero;
     }
 }
+
+const muestra = new Carta(-1, -1);
 
 //La asignacion esta justificada por la cantidad de espacios que tiene cada carta en sus contorno.
 const traduccionPalo = (palo) => {
@@ -93,7 +91,7 @@ let valores = [
             [8, 9, 10, 1, 2, 3, 4, 5, 6, 7]
             ];
 
-const valoresConMuestra = (muestra, valores) => {
+const valoresConMuestra = () => {
     const palo = traduccionPaloInverso(muestra.getPalo());
     const numero = muestra.getNumero();
     valores[palo][traduccionNumero(2)] = 19;
@@ -119,6 +117,14 @@ const valoresConMuestra = (muestra, valores) => {
     }
 }
 
+const reiniciarValores = () => {
+    valores.length = 0;
+    valores.push([8, 9, 10, 1, 2, 3, 4, 5, 6, 7]); 
+    valores.push([8, 9, 10, 1, 2, 3, 4, 5, 6, 7]);
+    valores.push([8, 9, 10, 1, 2, 3, 4, 5, 6, 7]);
+    valores.push([8, 9, 10, 1, 2, 3, 4, 5, 6, 7]);
+}
+
 let mazo = [
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12], 
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12],
@@ -126,12 +132,12 @@ let mazo = [
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12]
             ];
 
-const reiniciarMazo = (arr) => {
-    arr.length = 0;
-    arr.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
-    arr.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
-    arr.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
-    arr.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
+const reiniciarMazo = () => {
+    mazo.length = 0;
+    mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
+    mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
+    mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
+    mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
 }
 
 const reiniciarMano = (jugador1, jugador2) => {
@@ -154,14 +160,14 @@ const getNumeroRandom = () => {
 }
 
 //Obtiene una carta no repartida anteriormente.
-const getCombinacionValida = (baraja) => {
+const getCombinacionValida = () => {
     let palo;
     let numero;
     do {
         palo = getPaloRandom();
         numero = getNumeroRandom();
-    } while (baraja[palo][numero] === -1);
-    baraja[palo][numero] = -1;
+    } while (mazo[palo][numero] === -1);
+    mazo[palo][numero] = -1;
     if (numero < 7) {
         numero ++;
     }   else numero += 3;
@@ -170,14 +176,15 @@ const getCombinacionValida = (baraja) => {
 }
 
 // Reparte una carta a un jugador.
-const repartirCarta = (jugador, baraja) => {
-    jugador.cartas.push(getCombinacionValida(baraja));
+const repartirCarta = (jugador) => {
+    jugador.cartas.push(getCombinacionValida());
     jugador.cartas.shift();
 }
 
 const irAlMazo = (jugador1, jugador2) => {
     console.log(jugador1.nick+ ": Me voy al mazo");
     reiniciarMano(jugador1, jugador2);
+    reiniciarMazo();
 }
 
 const stringCarta = (carta) => {
@@ -185,19 +192,22 @@ const stringCarta = (carta) => {
 }
 
 // Reparte 1 carta a cada jugador hasta tener 3 cartas c/u. Retorna la muestra.
-const barajarRepartir = (jugador1, jugador2, baraja) => {
+const barajarRepartir = (jugador1, jugador2) => {
     if (jugador1.mano) {
         for (let i = 1; i <= 6; i++ ) {
-            repartirCarta(jugador2, baraja);
-            repartirCarta(jugador1, baraja);
+            repartirCarta(jugador2);
+            repartirCarta(jugador1);
         }
     } else {
         for (let i = 1; i <= 6; i++ ) {
-            repartirCarta(jugador1, baraja);
-            repartirCarta(jugador2, baraja);
+            repartirCarta(jugador1);
+            repartirCarta(jugador2);
         }
     }
-    return getCombinacionValida(mazo);
+    aux = getCombinacionValida();
+    muestra.palo = aux.getPalo();
+    muestra.numero = aux.getNumero();
+    return 0;
 }
 
 //Funcion que selecciona la carta a jugar por jugador.
@@ -217,70 +227,94 @@ const jugarCarta = (jugador) => {
     return opcion;
 }
 
-//Jugamos la mano, actualmente solo muestra las cartas de cada jugador y da la opcion de jugar una carta
-// o irse al mazo terminando la mano. No esta implementado sistema de puntos.
-const jugarMano = (jugador1, jugador2, muestra) => {
+const compararValores = (jugador1, jugador2, cartaj1, cartaj2, valores) => {
+    if(valores[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)] <
+        valores[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)] ) {
+            jugador2.puntos++;
+            return 2;
+        } else {
+            jugador1.puntos++;
+            return 1;
+        }
+}
+
+const jugarManoAMano = (jugador1, jugador2, fn) => {
     let jugadaJ1 = 1;
     let jugadaJ2 = 1;
-    let cantIteraciones = 1;
-    console.log("La muestra es: " + muestra.numero + " de " + muestra.palo);
-    //let valores = generarValores(muestra);
-    if(jugador1.mano) {
-        while( (jugadaJ1 !== 0) && (cantIteraciones <= 3) ) {
-            jugadaJ2 = jugarCarta(jugador2);
-            if (jugadaJ2 === 0) {
-                irAlMazo(jugador2, jugador1);
-                break;
-            } else {
-                console.log("La carta jugada por " + jugador2.nick + " es " + stringCarta(jugador2.cartas[jugadaJ2 - 1]));
-                console.log("");
-                jugador2.cartas.splice(jugadaJ2 - 1, 1);
-                jugadaJ1 = jugarCarta(jugador1);
-                if (jugadaJ1 === 0) {
-                    irAlMazo(jugador1, jugador2);
-                } else {
-                    console.log("La carta jugada por " + jugador1.nick + " es " + stringCarta(jugador1.cartas[jugadaJ1 - 1]));
-                    console.log("");
-                    jugador1.cartas.splice(jugadaJ1 - 1, 1);
-                }
-            }
-            cantIteraciones++;
-        }
+    jugadaJ2 = jugarCarta(jugador2);
+    if (jugadaJ2 === 0) {
+        jugador1.puntosPartido++;
+        return 0;
     } else {
-        while( (jugadaJ2 !== 0) && (cantIteraciones <= 3) ) {
-            jugadaJ1 = jugarCarta(jugador1);
-            if (jugadaJ1 === 0) {
-                irAlMazo(jugador1, jugador2);
+        console.log("La carta jugada por " + jugador2.nick + " es " + stringCarta(jugador2.cartas[jugadaJ2 - 1]));
+        console.log("");
+        const CartaJ2 = new Carta((jugador2.cartas[jugadaJ2 - 1].palo), (jugador2.cartas[jugadaJ2 - 1].numero));
+        jugador2.cartas.splice(jugadaJ2 - 1, 1);
+        jugadaJ1 = jugarCarta(jugador1);
+        if (jugadaJ1 === 0) {
+            jugador2.puntosPartido++;
+            irAlMazo(jugador1, jugador2);
+        } else {
+            console.log("La carta jugada por " + jugador1.nick + " es " + stringCarta(jugador1.cartas[jugadaJ1 - 1]));
+            console.log("");
+            const CartaJ1 = new Carta((jugador1.cartas[jugadaJ1 - 1].palo), (jugador1.cartas[jugadaJ1 - 1].numero));
+            jugador1.cartas.splice(jugadaJ1 - 1, 1);
+            return fn(jugador1, jugador2, CartaJ1, CartaJ2, valores);
+        }
+    }
+}
+
+//Jugamos la mano, actualmente solo muestra las cartas de cada jugador y da la opcion de jugar una carta
+// o irse al mazo terminando la mano. No esta implementado sistema de puntos.
+const jugarMano = (jugador1, jugador2) => {
+    let caso = -1;
+    let cantIteraciones = 1;
+    barajarRepartir(jugador1, jugador2);
+    valoresConMuestra();
+    console.log("La muestra es: " + muestra.getNumero() + " de " + muestra.getPalo());
+    if(jugador1.mano) {
+        while((cantIteraciones <= 3) && !(caso === 0)) {
+            caso = jugarManoAMano(jugador1, jugador2, compararValores);
+            if(jugador1.puntos === 2) {
+                jugador1.puntosPartido++;
                 break;
-            } else {
-                console.log("La carta jugada por " + jugador1.nick + "es " + stringCarta(jugador1.cartas[jugadaJ1 - 1]));
-                console.log("");
-                jugador1.cartas.splice(jugadaJ1 - 1, 1);
-                jugadaJ2 = jugarCarta(jugador2);
-                if (jugadaJ2 === 0) {
-                    irAlMazo(jugador2, jugador1);
-                } else {
-                    console.log("La carta jugada por " + jugador2.nick + "es " + stringCarta(jugador2.cartas[jugadaJ2 - 1]));
-                    console.log("");
-                    jugador2.cartas.splice(jugadaJ2 - 1, 1);
-                }
+            } else if(jugador2.puntos === 2) {
+                jugador2.puntosPartido++;
+                break;
             }
             cantIteraciones++;
         }
+        jugador1.mano = false;
+        jugador2.mano = true;
+    } else {
+        while((cantIteraciones <= 3) && !(caso === 0)) {
+            caso = jugarManoAMano(jugador2, jugador1, compararValores);
+            if(jugador2.puntos === 2) {
+                jugador2.puntosPartido++;
+                break;
+            } else if(jugador1.puntos === 2) {
+                jugador1.puntosPartido++;
+                break;
+            }
+            cantIteraciones++;
+        }
+        jugador1.mano = true;
+        jugador2.mano = false;
     }
-    if (!((jugadaJ2 === 0) || (jugadaJ1 === 0))) {
-        reiniciarMano(jugador1, jugador2);
-    }
+    irAlMazo(jugador1, jugador2);
+    reiniciarValores();
 }
-/*reiniciarMazo(mazo);
-muestra = barajarRepartir(jugador1, jugador2, mazo);
-jugarMano(jugador1, jugador2, muestra);
-reiniciarMazo(mazo); */
 
-const muestraTest = new Carta('Oro', 6);
-valoresConMuestra(muestraTest, valores);
-if ((valores[0][traduccionNumero(4)]) > (valores[0][traduccionNumero(2)])) {
-    console.log("hola");
+const jugarPartido = (jugador1, jugador2) => {
+    while(jugador1.puntosPartido < 2 && jugador2.puntosPartido < 2) {
+        jugarMano(jugador1, jugador2);
+    }
+    console.log("¡Buen partido!"); 
 }
-//console.log("¡Buen partido!"); 
+
+jugarPartido(jugador1, jugador2);
+
+
+
+
 
