@@ -1,15 +1,5 @@
-console.log("¡Bienvenido a Truco Uruguayo!");
-let nickJ1 = prompt("Ingrese nombre del JUGADOR 1");
-let nickJ2 = prompt("Ingrese nombre del JUGADOR 2")
-while (nickJ1 === null) {
-    nickJ1 = prompt("Ingrese nombre del JUGADOR 1")
-}
-while (nickJ2 === null) {
-    nickJ2 = prompt("Ingrese nombre del JUGADOR 2")
-}
-
 const jugador1 = {
-    nick: nickJ1,
+    nick: '',
     puntos: 0,
     cartas: ["vacio", "vacio", "vacio"],
     mano: true,
@@ -17,12 +7,16 @@ const jugador1 = {
 };
 
 const jugador2 = {
-    nick: nickJ2,
+    nick: '',
     puntosMano: 0,
     cartas: ["vacio", "vacio", "vacio"],
     mano: false,
     puntosPartido: 0,
 };
+
+let nickJ1 = document.getElementById('nombreJ1');
+let nickJ2 = document.getElementById('nombreJ2');
+let boton = document.getElementById('boton');
 
 class Carta {
     static id = 0;
@@ -75,6 +69,7 @@ const traduccionPaloInverso = (palo) => {
         break;
     }
 }
+
 //Ayuda a acceder al valor correcto en la matriz "valores".
 const traduccionNumero = (numero) => {
     if ( numero <= 7) {
@@ -176,9 +171,49 @@ const getCombinacionValida = () => {
 }
 
 // Reparte una carta a un jugador.
-const repartirCarta = (jugador) => {
-    jugador.cartas.push(getCombinacionValida());
+const repartirCartaJ1 = (jugador) => {
+    carta = getCombinacionValida();
+    jugador.cartas.push(carta);
     jugador.cartas.shift();
+    const contenedor = document.createElement("div");
+    const numero = document.createElement("h3");
+    const palo = document.createElement("h3");
+
+    contenedor.classList.add("carta");
+    numero.classList.add("numero");
+    palo.classList.add("palo");
+
+    numero.textContent = carta.getNumero();
+    palo.textContent = carta.getPalo();
+
+    contenedor.appendChild(palo);
+    contenedor.appendChild(numero)
+
+    const destino = document.querySelector("body .mesa-juego .cartas .jugador1");
+    destino.appendChild(contenedor);
+}
+
+const repartirCartaJ2 = (jugador) => {
+    carta = getCombinacionValida();
+    jugador.cartas.push(carta);
+    jugador.cartas.shift();
+
+    const contenedor = document.createElement("div");
+    const numero = document.createElement("h3");
+    const palo = document.createElement("h3");
+
+    contenedor.classList.add("carta");
+    numero.classList.add("numero");
+    palo.classList.add("palo");
+
+    numero.textContent = carta.getNumero();
+    palo.textContent = carta.getPalo();
+
+    contenedor.appendChild(palo);
+    contenedor.appendChild(numero)
+
+    const destino = document.querySelector("body .mesa-juego .cartas .jugador2");
+    destino.appendChild(contenedor);
 }
 
 const irAlMazo = (jugador1, jugador2) => {
@@ -195,13 +230,13 @@ const stringCarta = (carta) => {
 const barajarRepartir = (jugador1, jugador2) => {
     if (jugador1.mano) {
         for (let i = 1; i <= 6; i++ ) {
-            repartirCarta(jugador2);
-            repartirCarta(jugador1);
+            repartirCartaJ2(jugador2);
+            repartirCartaJ1(jugador1);
         }
     } else {
         for (let i = 1; i <= 6; i++ ) {
-            repartirCarta(jugador1);
-            repartirCarta(jugador2);
+            repartirCartaJ1(jugador1);
+            repartirCartaJ2(jugador2);
         }
     }
     aux = getCombinacionValida();
@@ -277,9 +312,11 @@ const jugarMano = (jugador1, jugador2) => {
             caso = jugarManoAMano(jugador1, jugador2, compararValores);
             if(jugador1.puntos === 2) {
                 jugador1.puntosPartido++;
+                console.log("j1 gano mano");
                 break;
             } else if(jugador2.puntos === 2) {
                 jugador2.puntosPartido++;
+                console.log("j2 gano mano");
                 break;
             }
             cantIteraciones++;
@@ -291,9 +328,11 @@ const jugarMano = (jugador1, jugador2) => {
             caso = jugarManoAMano(jugador2, jugador1, compararValores);
             if(jugador2.puntos === 2) {
                 jugador2.puntosPartido++;
+                console.log("j2 gano mano");
                 break;
             } else if(jugador1.puntos === 2) {
                 jugador1.puntosPartido++;
+                console.log("j1 gano mano");
                 break;
             }
             cantIteraciones++;
@@ -312,7 +351,13 @@ const jugarPartido = (jugador1, jugador2) => {
     console.log("¡Buen partido!"); 
 }
 
-jugarPartido(jugador1, jugador2);
+boton.addEventListener("click", function(){
+    jugador1.nick = nickJ1.value;
+    jugador2.nick = nickJ2.value;
+    jugarPartido(jugador1, jugador2);
+})
+
+
 
 
 

@@ -1,0 +1,57 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.formulario form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.formulario form div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.mesa-juego {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(0, 100, 0);
+}
+
+.mesa-juego .cartas {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    background-color: rgb(111, 75, 64);
+    min-height: 100px;
+    height: auto;
+    gap: 15px;
+}
+
+.mesa-juego .cartas .carta {
+    height: 50px;
+    width: 35px;
+    background-color: wheat;
+    border-radius: 5px;
+    box-shadow: 0 0 5px white;
+}
+
