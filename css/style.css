@@ -18,6 +18,15 @@ body {
     gap: 10px;
 }
 
+.formulario input {
+    height: 30px;
+    font-size: 1.3rem;
+}
+
+.formulario label, .mesa-juego h2 {
+    font-size: 2rem;
+}
+
 .formulario form div {
     display: flex;
     flex-direction: row;
