@@ -165,11 +165,9 @@ const compararValores = (jugador1, jugador2, cartaj1, cartaj2) => {
     
     if(valores[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)] <=
         valores[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)] ) {
-            console.log("entro j2 suma")
             jugador2.puntosMano++;
             return 0;
         } else {
-            console.log("entro j1 suma")
             jugador1.puntosMano++;
             return 0;
         }
@@ -310,9 +308,6 @@ const imprimirCartas = (jugador1, jugador2) => {
             compararValores(jugador1, jugador2, cartaj1, cartaj2);
         }
         if(!jugadorGano(jugador1) && !jugadorGano(jugador2)) {
-            console.log(jugador1.puntosMano + " J1")
-            console.log(jugador2.puntosMano + " J2")
-
             if(jugador1.puntosMano >= 2) {
                 jugador1.puntosPartido++;
                 actualizarPuntuacion(jugador1, jugador2);
