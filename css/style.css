@@ -38,18 +38,45 @@ body {
 
 .mesa-juego .cartas {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     width: 100%;
     background-color: rgb(111, 75, 64);
-    min-height: 100px;
-    height: auto;
+    height: 650px;
     gap: 15px;
 }
 
+.mesa-juego .cartas .jugadas {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.mesa-juego .cartas .jugadores {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0px 20px;
+}
+
+.mesa-juego .cartas .jugadores .jugador1, .mesa-juego .cartas .jugadores .jugador2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 50%;
+}
+
+
 .mesa-juego .cartas .carta {
-    height: 50px;
-    width: 35px;
+    height: 200px;
+    width: 120px;
     background-color: wheat;
     border-radius: 5px;
     box-shadow: 0 0 5px white;
