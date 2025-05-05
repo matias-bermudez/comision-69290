@@ -64,10 +64,6 @@ const obtenerJugador2LocalStorage = () => {
     return JSON.parse(localStorage.getItem('player2'));
 }
 
-let nickJ1 = document.getElementById('nombreJ1');
-let nickJ2 = document.getElementById('nombreJ2');
-let boton = document.getElementById('boton');
-
 //La asignacion esta justificada por la cantidad de espacios que tiene cada carta en sus contorno.
 const traduccionPalo = (palo) => {
     switch (palo) {
@@ -185,15 +181,6 @@ const getCombinacionValida = () => {
 const repartirCarta = (jugador) => {
     const carta = getCombinacionValida();
     jugador.cartas.push(carta);
-}
-
-const irAlMazo = (jugador1, jugador2) => {
-    reiniciarMano(jugador1, jugador2);
-    reiniciarMazo();
-}
-
-const stringCarta = (carta) => {
-    return carta.numero + " de " + carta.palo;
 }
 
 // Reparte 1 carta a cada jugador hasta tener 3 cartas c/u.
@@ -448,6 +435,8 @@ reanudar.addEventListener("click", function(event) {
     }
 });
 
+
+let boton = document.getElementById('boton');
 boton.addEventListener("click", function(event){
     event.preventDefault();
     let jug1 = obtenerJugador1LocalStorage();
@@ -456,6 +445,8 @@ boton.addEventListener("click", function(event){
         const alerta = document.getElementById('puntos');
         alerta.innerText = "Hay una partida en juego, reinicie memoria o reanude."
     } else {
+        let nickJ1 = document.getElementById('nombreJ1');
+        let nickJ2 = document.getElementById('nombreJ2');
         if (!localStorage.getItem('player1')) {
             localStorage.setItem('player1', JSON.stringify(jugador1));
         }
