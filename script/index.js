@@ -1,8 +1,18 @@
+class Carta {
+    static id = 0;
+    constructor (palo, numero) {
+        this.id = Carta.id++;
+        this.palo = palo,
+        this.numero = numero;
+    }
+}
+
 const jugador1 = {
     nick: '',
     puntosMano: 0,
     cartas: [],
     puntosPartido: 0,
+    jugada: new Carta("", -1),
 };
 
 const jugador2 = {
@@ -10,6 +20,7 @@ const jugador2 = {
     puntosMano: 0,
     cartas: [],
     puntosPartido: 0,
+    jugada: new Carta("", -1),
 };
 
 if (!localStorage.getItem('player1')) {
@@ -35,15 +46,6 @@ const obtenerJugador2LocalStorage = () => {
 let nickJ1 = document.getElementById('nombreJ1');
 let nickJ2 = document.getElementById('nombreJ2');
 let boton = document.getElementById('boton');
-
-class Carta {
-    static id = 0;
-    constructor (palo, numero) {
-        this.id = Carta.id++;
-        this.palo = palo,
-        this.numero = numero;
-    }
-}
 
 //La asignacion esta justificada por la cantidad de espacios que tiene cada carta en sus contorno.
 const traduccionPalo = (palo) => {
@@ -187,6 +189,7 @@ const barajarRepartir = () => {
     return 0;
 }
 
+//Suma un punto a puntosMano del jugador con mejor carta. Si hay empate gana jugador2.
 const compararValores = (cartaj1, cartaj2) => {
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
@@ -206,19 +209,27 @@ const compararValores = (cartaj1, cartaj2) => {
 }
 
 const noJugoJ2 = () => {
-    const paloj2 = document.getElementById('paloj2').innerText;
+    let jug2 = obtenerJugador2LocalStorage();
+    if(jug2.jugada.palo === "") {
+        return true;
+    }   else return false;
+    /*const paloj2 = document.getElementById('paloj2').innerText;
     const numeroj2 = document.getElementById('numeroj2').innerText;
     if(paloj2 === "" || numeroj2 ==="") {
         return true;
-    } else return false;
+    } else return false;*/
 }
 
 const noJugoJ1 = () => {
-    const paloj1 = document.getElementById('paloj1').innerText;
+    let jug1 = obtenerJugador1LocalStorage();
+    if(jug1.jugada.palo === "") {
+        return true;
+    }   else return false;
+    /*const paloj1 = document.getElementById('paloj1').innerText;
     const numeroj1 = document.getElementById('numeroj1').innerText;
     if(paloj1 === "" || numeroj1 === "") {
         return true;
-    } else return false;
+    } else return false;*/
 }
 
 const vaciarCartas = () => {
@@ -245,6 +256,14 @@ const vaciarCartasJugadas = () => {
     paloj2.textContent = "";
     const numeroj2 = document.getElementById('numeroj2');
     numeroj2.textContent = "";
+
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage()
+    jug1.jugada.palo = "";
+    jug1.jugada.numero = -1;
+    jug2.jugada.palo = "";
+    jug2.jugada.numero = -1;
+    actualizarLocalStorage(jug1, jug2);
 }
 
 const eliminarCarta = (carta, fn) => {
@@ -308,12 +327,13 @@ const imprimirCartas = () => {
                 palo.innerText = carta.palo;
                 numero.innerText = carta.numero;
                 const CartaJ1 = new Carta(palo.innerText, parseInt(numero.innerText));
+                jug1.jugada = CartaJ1;
+                actualizarLocalStorage(jug1, jug2);
                 eliminarCarta(CartaJ1, vaciarCartas);
                 if(!noJugoJ2()) {
-                    let palo2 = document.getElementById('paloj2');
-                    let numero2 = document.getElementById('numeroj2');
-                    const cartaJ2 = new Carta(palo2.innerText, parseInt(numero2.innerText));
-                    compararValores(CartaJ1, cartaJ2);
+                    jug2 = obtenerJugador2LocalStorage();
+                    const CartaJ2 = jug2.jugada;
+                    compararValores(CartaJ1, CartaJ2);
                     vaciarCartasJugadas();
                 }
                 imprimirCartas();
@@ -338,15 +358,13 @@ const imprimirCartas = () => {
                 palo.innerText = carta.palo;
                 numero.innerText = carta.numero;
                 const CartaJ2 = new Carta(palo.innerText, parseInt(numero.innerText));
+                jug2.jugada = CartaJ2;
+                actualizarLocalStorage(jug1, jug2);
                 eliminarCarta(CartaJ2, vaciarCartas);
-                jug2 = obtenerJugador2LocalStorage();
                 if(!noJugoJ1()) {
-                    let palo1 = document.getElementById('paloj1');
-                    let numero1 = document.getElementById('numeroj1');
-                    const cartaJ1 = new Carta(palo1.innerText, parseInt(numero1.innerText));
-                    compararValores(cartaJ1, CartaJ2);
                     jug1 = obtenerJugador1LocalStorage();
-                    jug2 = obtenerJugador2LocalStorage();
+                    const cartaJ1 = jug1.jugada;
+                    compararValores(cartaJ1, CartaJ2);
                     vaciarCartasJugadas();
                 }
                 imprimirCartas();
@@ -393,6 +411,27 @@ const jugarPartido = () => {
     barajarRepartir();
     imprimirCartas();
 }
+
+const reanudar = document.getElementById('retomar');
+reanudar.addEventListener("click", function() {
+    imprimirCartas();
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    if(!(jug1.jugada.numero === -1)) {
+        console.log("entro");
+        let palo = document.getElementById('paloj1');
+        let numero = document.getElementById('numeroj1');
+        palo.innerText = jug1.jugada.palo;
+        numero.innerText = jug1.jugada.numero;
+    }
+    if(!(jug2.jugada.numero === -1)) {
+        console.log("entro");
+        let palo = document.getElementById('paloj2');
+        let numero = document.getElementById('numeroj2');
+        palo.innerText = jug2.jugada.palo;
+        numero.innerText = jug2.jugada.numero;
+    }
+});
 
 boton.addEventListener("click", function(event){
     if (!localStorage.getItem('player1')) {

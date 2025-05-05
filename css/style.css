@@ -11,6 +11,10 @@ body {
     gap: 20px;
 }
 
+body h1 {
+    font-size: 3rem;
+}
+
 .formulario form {
     display: flex;
     flex-direction: column;
@@ -18,9 +22,10 @@ body {
     gap: 10px;
 }
 
-.formulario input {
-    height: 30px;
-    font-size: 1.3rem;
+.formulario form button, .formulario input {
+    width: 210px;
+    height: 40px;
+    font-size: 1.5rem;
 }
 
 .formulario label, .mesa-juego h2 {
