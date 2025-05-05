@@ -23,6 +23,27 @@ const jugador2 = {
     jugada: new Carta("", -1),
 };
 
+const reiniciarJugadores = (jug1, jug2) => {
+    jug1.nick = '';
+    jug1.puntosMano = 0;
+    jug1.cartas = [];
+    jug1.puntosPartido = 0;
+    jug1.jugada = new Carta("", -1);
+
+    jug2.nick = '';
+    jug2.puntosMano = 0;
+    jug2.cartas = [];
+    jug2.puntosPartido = 0;
+    jug2.jugada = new Carta("", -1);
+}
+
+const reiniciarCartasJugadas = (jug1, jug2) => {
+    jug1.jugada.palo = "";
+    jug1.jugada.numero = -1;
+    jug2.jugada.palo = "";
+    jug2.jugada.numero = -1;
+}
+
 if (!localStorage.getItem('player1')) {
     localStorage.setItem('player1', JSON.stringify(jugador1));
 }
@@ -196,8 +217,7 @@ const compararValores = (cartaj1, cartaj2) => {
     if(valores[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)] <=
         valores[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)] ) {
             jug2.puntosMano++;
-            if(jug2.puntosMano < 2) {
-                
+            if(jug2.puntosMano < 2) {   
             }
         } else {
             jug1.puntosMano++;
@@ -213,11 +233,6 @@ const noJugoJ2 = () => {
     if(jug2.jugada.palo === "") {
         return true;
     }   else return false;
-    /*const paloj2 = document.getElementById('paloj2').innerText;
-    const numeroj2 = document.getElementById('numeroj2').innerText;
-    if(paloj2 === "" || numeroj2 ==="") {
-        return true;
-    } else return false;*/
 }
 
 const noJugoJ1 = () => {
@@ -225,11 +240,6 @@ const noJugoJ1 = () => {
     if(jug1.jugada.palo === "") {
         return true;
     }   else return false;
-    /*const paloj1 = document.getElementById('paloj1').innerText;
-    const numeroj1 = document.getElementById('numeroj1').innerText;
-    if(paloj1 === "" || numeroj1 === "") {
-        return true;
-    } else return false;*/
 }
 
 const vaciarCartas = () => {
@@ -246,7 +256,7 @@ const actualizarPuntuacion = () => {
     puntuacion.innerText=`${jug1.nick}: ${jug1.puntosPartido} - ${jug2.nick}: ${jug2.puntosPartido}`;
 } 
 
-const vaciarCartasJugadas = () => {
+const vaciarCartasJugadas = (fn) => {
     const paloj1 = document.getElementById('paloj1');
     paloj1.textContent = "";
     const numeroj1 = document.getElementById('numeroj1');
@@ -256,13 +266,9 @@ const vaciarCartasJugadas = () => {
     paloj2.textContent = "";
     const numeroj2 = document.getElementById('numeroj2');
     numeroj2.textContent = "";
-
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage()
-    jug1.jugada.palo = "";
-    jug1.jugada.numero = -1;
-    jug2.jugada.palo = "";
-    jug2.jugada.numero = -1;
+    fn(jug1, jug2);
     actualizarLocalStorage(jug1, jug2);
 }
 
@@ -295,6 +301,14 @@ const eliminarCarta = (carta, fn) => {
     }
     actualizarLocalStorage(jug1, jug2);
     fn();
+}
+
+const hayCartasEnJuego = () => {
+    const destinoJ1 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
+    const destinoJ2 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
+    if(destinoJ1.children.length > 0 || destinoJ2.children.length > 0) {
+        return true;
+    }   else return false;
 }
 
 const jugadorGano = (jugador) => {
@@ -334,7 +348,7 @@ const imprimirCartas = () => {
                     jug2 = obtenerJugador2LocalStorage();
                     const CartaJ2 = jug2.jugada;
                     compararValores(CartaJ1, CartaJ2);
-                    vaciarCartasJugadas();
+                    vaciarCartasJugadas(reiniciarCartasJugadas);
                 }
                 imprimirCartas();
             }
@@ -365,7 +379,7 @@ const imprimirCartas = () => {
                     jug1 = obtenerJugador1LocalStorage();
                     const cartaJ1 = jug1.jugada;
                     compararValores(cartaJ1, CartaJ2);
-                    vaciarCartasJugadas();
+                    vaciarCartasJugadas(reiniciarCartasJugadas);
                 }
                 imprimirCartas();
             }
@@ -413,45 +427,59 @@ const jugarPartido = () => {
 }
 
 const reanudar = document.getElementById('retomar');
-reanudar.addEventListener("click", function() {
-    imprimirCartas();
-    let jug1 = obtenerJugador1LocalStorage();
-    let jug2 = obtenerJugador2LocalStorage();
-    if(!(jug1.jugada.numero === -1)) {
-        console.log("entro");
-        let palo = document.getElementById('paloj1');
-        let numero = document.getElementById('numeroj1');
-        palo.innerText = jug1.jugada.palo;
-        numero.innerText = jug1.jugada.numero;
-    }
-    if(!(jug2.jugada.numero === -1)) {
-        console.log("entro");
-        let palo = document.getElementById('paloj2');
-        let numero = document.getElementById('numeroj2');
-        palo.innerText = jug2.jugada.palo;
-        numero.innerText = jug2.jugada.numero;
+reanudar.addEventListener("click", function(event) {
+    event.preventDefault();
+    if(!hayCartasEnJuego()) {
+        imprimirCartas();
+        let jug1 = obtenerJugador1LocalStorage();
+        let jug2 = obtenerJugador2LocalStorage();
+        if(!(jug1.jugada.numero === -1)) {
+            let palo = document.getElementById('paloj1');
+            let numero = document.getElementById('numeroj1');
+            palo.innerText = jug1.jugada.palo;
+            numero.innerText = jug1.jugada.numero;
+        }
+        if(!(jug2.jugada.numero === -1)) {
+            let palo = document.getElementById('paloj2');
+            let numero = document.getElementById('numeroj2');
+            palo.innerText = jug2.jugada.palo;
+            numero.innerText = jug2.jugada.numero;
+        }
     }
 });
 
 boton.addEventListener("click", function(event){
-    if (!localStorage.getItem('player1')) {
-        localStorage.setItem('player1', JSON.stringify(jugador1));
-    }
-    if (!localStorage.getItem('player2')) {
-        localStorage.setItem('player2', JSON.stringify(jugador2));
-    }
     event.preventDefault();
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
-    jug1.nick = nickJ1.value;
-    jug2.nick = nickJ2.value;
-    actualizarLocalStorage(jug1, jug2);
-    jugarPartido();
+    if(jug2.cartas.length > 0 || jug1.cartas.length > 0) {
+        const alerta = document.getElementById('puntos');
+        alerta.innerText = "Hay una partida en juego, reinicie memoria o reanude."
+    } else {
+        if (!localStorage.getItem('player1')) {
+            localStorage.setItem('player1', JSON.stringify(jugador1));
+        }
+        if (!localStorage.getItem('player2')) {
+            localStorage.setItem('player2', JSON.stringify(jugador2));
+        }
+        jug1.nick = nickJ1.value;
+        jug2.nick = nickJ2.value;
+        actualizarLocalStorage(jug1, jug2);
+        jugarPartido();
+    }
 });
 
 const reiniciar = document.getElementById('reinicio');
 reiniciar.addEventListener("click", function(){
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
     localStorage.removeItem('player1');
     localStorage.removeItem('player2');
+    reiniciarJugadores(jug1, jug2);
+    actualizarLocalStorage(jug1, jug2);
+    const destinoJ1 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
+    const destinoJ2 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
+    destinoJ1.innerHTML = ``;
+    destinoJ2.innerHTML = ``;
 });
 
