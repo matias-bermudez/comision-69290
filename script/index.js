@@ -229,6 +229,11 @@ const noJugoJ1 = () => {
     }   else return false;
 }
 
+const vaciarReglas = () => {
+    const reglas = document.querySelector("body .mesa-juego .cartas .reglas");
+    reglas.innerHTML = ``;
+}
+
 const vaciarCartas = () => {
     const contenedor1 = document.querySelector('.mesa-juego .cartas .jugadores .jugador1');
     contenedor1.innerHTML= ``;
@@ -417,6 +422,7 @@ const reanudar = document.getElementById('retomar');
 reanudar.addEventListener("click", function(event) {
     event.preventDefault();
     if(!hayCartasEnJuego()) {
+        vaciarReglas();
         imprimirCartas();
         let jug1 = obtenerJugador1LocalStorage();
         let jug2 = obtenerJugador2LocalStorage();
@@ -445,6 +451,7 @@ boton.addEventListener("click", function(event){
         const alerta = document.getElementById('puntos');
         alerta.innerText = "Hay una partida en juego, reinicie memoria o reanude."
     } else {
+        vaciarReglas();
         let nickJ1 = document.getElementById('nombreJ1');
         let nickJ2 = document.getElementById('nombreJ2');
         if (!localStorage.getItem('player1')) {
