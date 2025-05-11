@@ -90,11 +90,28 @@ body h1 {
 
 
 .mesa-juego .cartas .carta {
+    /*position: relative;*/
     height: 200px;
     width: 120px;
     background-color: wheat;
     border-radius: 5px;
     box-shadow: 0 0 5px white;
+}
+
+.mesa-juego .cartas .carta button {
+    /*position: absolute;*/
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    /*cursor: pointer;*/
+}
+
+.mesa-juego .cartas .carta h3 { 
+    position: relative;
+    z-index: 1;
+    /*pointer-events: none;*/
 }
 
 .mesa-juego .cartas .reglas {
