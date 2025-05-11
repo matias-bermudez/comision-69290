@@ -373,9 +373,10 @@ const imprimirCartas = () => {
             const card = document.createElement("div");
             card.classList.add("carta");
             card.innerHTML=`
-                <h3 class="palo">${carta.palo}</h3>
-                <h3 class="numero">${carta.numero}</h3>
-                <button id="${carta.palo}${carta.numero}">Jugar</button>
+                <button id="${carta.palo}${carta.numero}">
+                    <h3 class="palo">${carta.palo}</h3>
+                    <h3 class="numero">${carta.numero}</h3>
+                </button>
             `
             const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
             destino.appendChild(card);
@@ -437,9 +438,10 @@ const imprimirCartas = () => {
             const card = document.createElement("div");
             card.classList.add("carta");
             card.innerHTML=`
-                <h3 class="palo">${carta.palo}</h3>
-                <h3 class="numero">${carta.numero}</h3>
-                <button id="${carta.palo}${carta.numero}">Jugar</button>
+                <button id="${carta.palo}${carta.numero}">
+                    <h3 class="palo">${carta.palo}</h3>
+                    <h3 class="numero">${carta.numero}</h3>
+                </button>
             `
             const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
             destino.appendChild(card);
