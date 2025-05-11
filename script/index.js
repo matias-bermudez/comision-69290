@@ -237,9 +237,9 @@ const vaciarReglas = () => {
 }
 
 const vaciarCartas = () => {
-    const contenedor1 = document.querySelector('.mesa-juego .cartas .jugadores .jugador1');
+    const contenedor1 = document.querySelector(".mesa-juego .cartas .jugadores .jugador1");
     contenedor1.innerHTML= ``;
-    const contenedor2 = document.querySelector('.mesa-juego .cartas .jugadores .jugador2');
+    const contenedor2 = document.querySelector(".mesa-juego .cartas .jugadores .jugador2");
     contenedor2.innerHTML= ``;
 }
 
