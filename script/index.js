@@ -203,17 +203,29 @@ const barajarRepartir = () => {
 const compararValores = (cartaj1, cartaj2) => {
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
-    if(valores[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)] <=
-        valores[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)] ) {
-            jug2.puntosMano++;
-            if(jug2.puntosMano < 2) {   
-            }
-        } else {
-            jug1.puntosMano++;
+    if(jug1.mano) {
+        if(valores[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)] <=
+            valores[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)] ) {
+                jug2.puntosMano++;
+                if(jug2.puntosMano < 2) {   
+                }
+            } else {
+                jug1.puntosMano++;
 
-            if(jug1.puntosMano < 2) {
+                if(jug1.puntosMano < 2) {
+                }
             }
-        }
+    } else if(valores[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)] <
+            valores[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)] ) {
+                jug2.puntosMano++;
+                if(jug2.puntosMano < 2) {   
+                }
+            } else {
+                jug1.puntosMano++;
+
+                if(jug1.puntosMano < 2) {
+                }
+            }
     actualizarLocalStorage(jug1, jug2);
 }
 
@@ -238,9 +250,9 @@ const vaciarReglas = () => {
 
 const vaciarCartas = () => {
     const contenedor1 = document.querySelector(".mesa-juego .cartas .jugadores .jugador1");
-    contenedor1.innerHTML= ``;
+    contenedor1.innerHTML = ``;
     const contenedor2 = document.querySelector(".mesa-juego .cartas .jugadores .jugador2");
-    contenedor2.innerHTML= ``;
+    contenedor2.innerHTML = ``;
 }
 
 const actualizarPuntuacion = () => {
@@ -372,7 +384,8 @@ const imprimirCartas = () => {
         jug1.cartas.forEach(carta => {
             const card = document.createElement("div");
             card.classList.add("carta");
-            card.innerHTML=`
+            card.innerHTML =
+            `
                 <button id="${carta.palo}${carta.numero}">
                     <h3 class="palo">${carta.palo}</h3>
                     <h3 class="numero">${carta.numero}</h3>
@@ -437,7 +450,8 @@ const imprimirCartas = () => {
         jug2.cartas.forEach(carta => {
             const card = document.createElement("div");
             card.classList.add("carta");
-            card.innerHTML=`
+            card.innerHTML =
+            `
                 <button id="${carta.palo}${carta.numero}">
                     <h3 class="palo">${carta.palo}</h3>
                     <h3 class="numero">${carta.numero}</h3>
