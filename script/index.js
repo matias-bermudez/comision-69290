@@ -8,29 +8,31 @@ class Carta {
 }
 
 const jugador1 = {
-    nick: '',
+    nick: "",
     puntosMano: 0,
     cartas: [],
     puntosPartido: 0,
     jugada: new Carta("", -1),
+    mano: true,
 };
 
 const jugador2 = {
-    nick: '',
+    nick: "",
     puntosMano: 0,
     cartas: [],
     puntosPartido: 0,
     jugada: new Carta("", -1),
+    mano: false,
 };
 
 const reiniciarJugadores = (jug1, jug2) => {
-    jug1.nick = '';
+    jug1.nick = "";
     jug1.puntosMano = 0;
     jug1.cartas = [];
     jug1.puntosPartido = 0;
     jug1.jugada = new Carta("", -1);
 
-    jug2.nick = '';
+    jug2.nick = "";
     jug2.puntosMano = 0;
     jug2.cartas = [];
     jug2.puntosPartido = 0;
@@ -248,6 +250,21 @@ const actualizarPuntuacion = () => {
     puntuacion.innerText=`${jug1.nick}: ${jug1.puntosPartido} - ${jug2.nick}: ${jug2.puntosPartido}`;
 } 
 
+const vaciarCartasMesaJ1 = () => {
+    const cartas = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
+    cartas.innerHTML = ``;
+}
+
+const vaciarCartasMesaJ2 = () => {
+    const cartas = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
+    cartas.innerHTML = ``;
+}
+
+const vaciarCartasMesa = () => {
+    vaciarCartasMesaJ1();
+    vaciarCartasMesaJ2();
+}
+
 const vaciarCartasJugadas = (fn) => {
     const paloj1 = document.getElementById('paloj1');
     paloj1.textContent = "";
@@ -311,73 +328,145 @@ const jugadorGano = (jugador) => {
     }
 }
 
+let tiempoActual;
+
 const imprimirCartas = () => {
     actualizarPuntuacion();
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
-    jug1.cartas.forEach(carta => {
-        const card = document.createElement("div");
-        card.classList.add("carta");
-        card.innerHTML=`
-            <h3 class="palo">${carta.palo}</h3>
-            <h3 class="numero">${carta.numero}</h3>
-            <button id="${carta.palo}${carta.numero}">Jugar</button>
-        `
-        const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
-        destino.appendChild(card);
-        const boton = document.getElementById(`${carta.palo}${carta.numero}`);
-        boton.addEventListener("click", () => {
-            let palo = document.getElementById('paloj1');
-            let numero = document.getElementById('numeroj1');
-            if(palo.innerText == "" && numero.innerText == "") {
-                palo.innerText = carta.palo;
-                numero.innerText = carta.numero;
-                const CartaJ1 = new Carta(palo.innerText, parseInt(numero.innerText));
-                jug1.jugada = CartaJ1;
-                actualizarLocalStorage(jug1, jug2);
-                eliminarCarta(CartaJ1, vaciarCartas);
-                if(!noJugoJ2()) {
-                    jug2 = obtenerJugador2LocalStorage();
-                    const CartaJ2 = jug2.jugada;
-                    compararValores(CartaJ1, CartaJ2);
-                    vaciarCartasJugadas(reiniciarCartasJugadas);
-                }
-                imprimirCartas();
+    if(jug2.mano) {
+        vaciarCartasMesaJ2();
+        jug1.mano = true;
+        jug2.mano = false;
+        actualizarLocalStorage(jug1, jug2);
+        jug1 = obtenerJugador1LocalStorage();
+        jug2 = obtenerJugador2LocalStorage();
+        let jugoJ1 = false;
+        if(jugadorGano(jug2) || jugadorGano(jug1)) {
+            if (jugadorGano(jug2)) {
+                const marcador = document.getElementById('puntos');
+                marcador.innerText = `Ganó ${jug2.nick}, fin del partido.`
+                return 0;
+            } else {
+                const marcador = document.getElementById('puntos');
+                marcador.innerText = `Ganó ${jug1.nick}, fin del partido.`
+                return 0;
             }
-        });
-    });
-    jug2.cartas.forEach(carta => {
-        const card = document.createElement("div");
-        card.classList.add("carta");
-        card.innerHTML=`
-            <h3 class="palo">${carta.palo}</h3>
-            <h3 class="numero">${carta.numero}</h3>
-            <button id="${carta.palo}${carta.numero}">Jugar</button>
-        `
-        const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
-        destino.appendChild(card);
-        const boton = document.getElementById(`${carta.palo}${carta.numero}`);
-        boton.addEventListener("click", () => {
-            let palo = document.getElementById('paloj2');
-            let numero = document.getElementById('numeroj2');
-            if(palo.innerText == "" && numero.innerText == "") {
-                palo.innerText = carta.palo;
-                numero.innerText = carta.numero;
-                const CartaJ2 = new Carta(palo.innerText, parseInt(numero.innerText));
-                jug2.jugada = CartaJ2;
-                actualizarLocalStorage(jug1, jug2);
-                eliminarCarta(CartaJ2, vaciarCartas);
-                if(!noJugoJ1()) {
-                    jug1 = obtenerJugador1LocalStorage();
-                    const cartaJ1 = jug1.jugada;
-                    compararValores(cartaJ1, CartaJ2);
+        } else {
+            tiempoActual = setTimeout(() => {
+                if(!jugoJ1) {
                     vaciarCartasJugadas(reiniciarCartasJugadas);
+                    vaciarCartasMesa();
+                    jug2.cartas = [];
+                    jug1.cartas = [];
+                    reiniciarPtosMano();
+                    jug2.puntosPartido++;
+                    actualizarLocalStorage(jug1, jug2);
+                    imprimirCartas();
                 }
-                imprimirCartas();
-            }
+            }, 10000);
+        }
+        jug1 = obtenerJugador1LocalStorage();
+        jug2 = obtenerJugador2LocalStorage();
+        vaciarCartasMesaJ1();
+        jug1.cartas.forEach(carta => {
+            const card = document.createElement("div");
+            card.classList.add("carta");
+            card.innerHTML=`
+                <h3 class="palo">${carta.palo}</h3>
+                <h3 class="numero">${carta.numero}</h3>
+                <button id="${carta.palo}${carta.numero}">Jugar</button>
+            `
+            const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
+            destino.appendChild(card);
+            const boton = document.getElementById(`${carta.palo}${carta.numero}`);
+            boton.addEventListener("click", () => {
+                clearTimeout(tiempoActual);
+                jugoJ1 = true;
+                let palo = document.getElementById('paloj1');
+                let numero = document.getElementById('numeroj1');
+                if(palo.innerText == "" && numero.innerText == "") {
+                    palo.innerText = carta.palo;
+                    numero.innerText = carta.numero;
+                    const CartaJ1 = new Carta(palo.innerText, parseInt(numero.innerText));
+                    jug1.jugada = CartaJ1;
+                    actualizarLocalStorage(jug1, jug2);
+                    eliminarCarta(CartaJ1, vaciarCartas);
+                    if(!noJugoJ2()) {
+                        jug2 = obtenerJugador2LocalStorage();
+                        const CartaJ2 = jug2.jugada;
+                        compararValores(CartaJ1, CartaJ2);
+                        vaciarCartasJugadas(reiniciarCartasJugadas);
+                    }
+                    imprimirCartas();
+                }
+            });
         });
-    });
-    
+    } else {
+        jug1.mano = false;
+        jug2.mano = true;
+        actualizarLocalStorage(jug1, jug2);
+        jug1 = obtenerJugador1LocalStorage();
+        jug2 = obtenerJugador2LocalStorage();
+        let jugoJ2 = false;
+        vaciarCartasMesaJ1();
+        if(jugadorGano(jug2) || jugadorGano(jug1)) {
+            if (jugadorGano(jug2)) {
+                const marcador = document.getElementById('puntos');
+                marcador.innerText = `Ganó ${jug2.nick}, fin del partido.`
+                return 0;
+            } else {
+                const marcador = document.getElementById('puntos');
+                marcador.innerText = `Ganó ${jug1.nick}, fin del partido.`
+                return 0;
+            }
+        } else {
+            tiempoActual = setTimeout(() => {
+                if(!jugoJ2) {
+                    vaciarCartasJugadas(reiniciarCartasJugadas);
+                    vaciarCartasMesaJ2();
+                    jug2.cartas = [];
+                    jug1.cartas = [];
+                    jug1.puntosPartido++;
+                    actualizarLocalStorage(jug1, jug2);
+                    imprimirCartas();                
+                }
+            }, 10000);
+        }
+        jug2.cartas.forEach(carta => {
+            const card = document.createElement("div");
+            card.classList.add("carta");
+            card.innerHTML=`
+                <h3 class="palo">${carta.palo}</h3>
+                <h3 class="numero">${carta.numero}</h3>
+                <button id="${carta.palo}${carta.numero}">Jugar</button>
+            `
+            const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
+            destino.appendChild(card);
+            const boton = document.getElementById(`${carta.palo}${carta.numero}`);
+            boton.addEventListener("click", () => {
+                clearTimeout(tiempoActual);
+                jugoJ2 = true;
+                let palo = document.getElementById('paloj2');
+                let numero = document.getElementById('numeroj2');
+                if(palo.innerText == "" && numero.innerText == "") {
+                    palo.innerText = carta.palo;
+                    numero.innerText = carta.numero;
+                    const CartaJ2 = new Carta(palo.innerText, parseInt(numero.innerText));
+                    jug2.jugada = CartaJ2;
+                    actualizarLocalStorage(jug1, jug2);
+                    eliminarCarta(CartaJ2, vaciarCartas);
+                    if(!noJugoJ1()) {
+                        jug1 = obtenerJugador1LocalStorage();
+                        const cartaJ1 = jug1.jugada;
+                        compararValores(cartaJ1, CartaJ2);
+                        vaciarCartasJugadas(reiniciarCartasJugadas);
+                    }
+                    imprimirCartas();
+                }
+            });
+        });
+    }
     if(jug1.cartas.length === 0 && jug2.cartas.length === 0) {
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
@@ -445,15 +534,15 @@ reanudar.addEventListener("click", function(event) {
 let boton = document.getElementById('boton');
 boton.addEventListener("click", function(event){
     event.preventDefault();
+    let nickJ1 = document.getElementById('nombreJ1');
+    let nickJ2 = document.getElementById('nombreJ2');
+    const alerta = document.getElementById('puntos');
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
-    if(jug2.cartas.length > 0 || jug1.cartas.length > 0) {
-        const alerta = document.getElementById('puntos');
+    if(jug2.cartas.length > 0 || jug1.cartas.length > 0 || jug1.puntosPartido > 0 || jug2.puntosPartido > 0) {
         alerta.innerText = "Hay una partida en juego, reinicie memoria o reanude."
-    } else {
+    } else if(nickJ1.value !== "" && nickJ2.value !== "") {
         vaciarReglas();
-        let nickJ1 = document.getElementById('nombreJ1');
-        let nickJ2 = document.getElementById('nombreJ2');
         if (!localStorage.getItem('player1')) {
             localStorage.setItem('player1', JSON.stringify(jugador1));
         }
@@ -464,6 +553,8 @@ boton.addEventListener("click", function(event){
         jug2.nick = nickJ2.value;
         actualizarLocalStorage(jug1, jug2);
         jugarPartido();
+    } else {
+        alerta.innerText = `Ingrese nombres para comenzar.`
     }
 });
 
@@ -479,5 +570,6 @@ reiniciar.addEventListener("click", function(){
     const destinoJ2 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
     destinoJ1.innerHTML = ``;
     destinoJ2.innerHTML = ``;
+    vaciarCartasJugadas(reiniciarCartasJugadas);
 });
 
