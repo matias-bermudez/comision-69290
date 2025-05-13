@@ -110,13 +110,6 @@ const traduccionNumero = (numero) => {
     }
 }
 
-let valores = [
-            [8, 9, 10, 1, 2, 3, 11, 5, 6, 7], 
-            [8, 9, 10, 1, 2, 3, 4, 5, 6, 7],
-            [14, 9, 10, 1, 2, 3, 12, 5, 6, 7],
-            [13, 9, 10, 1, 2, 3, 4, 5, 6, 7]
-            ];
-
 let mazo = [
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12], 
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12],
@@ -199,34 +192,45 @@ const barajarRepartir = () => {
     return 0;
 }
 
-//Suma un punto a puntosMano del jugador con mejor carta. Si hay empate gana jugador2.
-const compararValores = (cartaj1, cartaj2) => {
+const cambioMano = () => {
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
     if(jug1.mano) {
-        if(valores[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)] <=
-            valores[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)] ) {
+        jug1.mano = false;
+        jug2.mano = true;
+    } else {
+        jug1.mano = true;
+        jug2.mano = false;
+    }
+    actualizarLocalStorage(jug1, jug2);
+}
+
+//Suma un punto a puntosMano del jugador con mejor carta. Si hay empate gana jugador2.
+const compararValores = async (cartaj1, cartaj2) => {
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    try {
+        let solicitud = await fetch("./db/data.json");
+        let response = await solicitud.json();
+        const valorJ1 = response[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)];
+        const valorJ2 = response[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)];
+        if(jug1.mano) {
+            if(valorJ1 <= valorJ2) {
                 jug2.puntosMano++;
-                if(jug2.puntosMano < 2) {   
-                }
             } else {
                 jug1.puntosMano++;
-
-                if(jug1.puntosMano < 2) {
-                }
             }
-    } else if(valores[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)] <
-            valores[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)] ) {
+        } else if(valorJ1 < valorJ2) {
                 jug2.puntosMano++;
-                if(jug2.puntosMano < 2) {   
-                }
             } else {
                 jug1.puntosMano++;
-
-                if(jug1.puntosMano < 2) {
-                }
             }
     actualizarLocalStorage(jug1, jug2);
+    } catch(err) {
+        //
+    } finally {
+        //
+    }
 }
 
 const noJugoJ2 = () => {
@@ -241,6 +245,46 @@ const noJugoJ1 = () => {
     if(jug1.jugada.palo === "") {
         return true;
     }   else return false;
+}
+
+const noHayCartaJugadaJ1 = () => {
+    const palo = document.getElementById('paloj1');
+    const numero = document.getElementById('numeroj1');
+    if(palo.innerText == "" && numero.innerText == "") {
+        return true;
+    } else return false;
+}
+
+const noHayCartaJugadaJ2 = () => {
+    const palo = document.getElementById('paloj2');
+    const numero = document.getElementById('numeroj2');
+    if(palo.innerText == "" && numero.innerText == "") {
+        return true;
+    } else return false;
+}
+
+const actualizarCartaJugadaJ1 = (palo, numero) => {
+    const carta = new Carta(palo, numero);
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    jug1.jugada = carta;
+    const paloJugada = document.getElementById('paloj1');
+    const numeroJugada = document.getElementById('numeroj1');
+    paloJugada.innerText = palo;
+    numeroJugada.innerText = numero;
+    actualizarLocalStorage(jug1, jug2);
+}
+
+const actualizarCartaJugadaJ2 = (palo, numero) => {
+    const carta = new Carta(palo, numero);
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    jug2.jugada = carta;
+    const paloJugada = document.getElementById('paloj2');
+    const numeroJugada = document.getElementById('numeroj2');
+    paloJugada.innerText = palo;
+    numeroJugada.innerText = numero;
+    actualizarLocalStorage(jug1, jug2);
 }
 
 const vaciarReglas = () => {
@@ -348,9 +392,7 @@ const imprimirCartas = () => {
     let jug2 = obtenerJugador2LocalStorage();
     if(jug2.mano) {
         vaciarCartasMesaJ2();
-        jug1.mano = true;
-        jug2.mano = false;
-        actualizarLocalStorage(jug1, jug2);
+        cambioMano();
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
         let jugoJ1 = false;
@@ -394,12 +436,12 @@ const imprimirCartas = () => {
             const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
             destino.appendChild(card);
             const boton = document.getElementById(`${carta.palo}${carta.numero}`);
-            boton.addEventListener("click", () => {
+            boton.addEventListener("click", async () => {
                 clearTimeout(tiempoActual);
                 jugoJ1 = true;
                 let palo = document.getElementById('paloj1');
                 let numero = document.getElementById('numeroj1');
-                if(palo.innerText == "" && numero.innerText == "") {
+                if(noHayCartaJugadaJ1()) {
                     palo.innerText = carta.palo;
                     numero.innerText = carta.numero;
                     const CartaJ1 = new Carta(palo.innerText, parseInt(numero.innerText));
@@ -409,7 +451,7 @@ const imprimirCartas = () => {
                     if(!noJugoJ2()) {
                         jug2 = obtenerJugador2LocalStorage();
                         const CartaJ2 = jug2.jugada;
-                        compararValores(CartaJ1, CartaJ2);
+                        await compararValores(CartaJ1, CartaJ2);
                         vaciarCartasJugadas(reiniciarCartasJugadas);
                     }
                     imprimirCartas();
@@ -417,9 +459,7 @@ const imprimirCartas = () => {
             });
         });
     } else {
-        jug1.mano = false;
-        jug2.mano = true;
-        actualizarLocalStorage(jug1, jug2);
+        cambioMano()
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
         let jugoJ2 = false;
@@ -460,7 +500,7 @@ const imprimirCartas = () => {
             const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
             destino.appendChild(card);
             const boton = document.getElementById(`${carta.palo}${carta.numero}`);
-            boton.addEventListener("click", () => {
+            boton.addEventListener("click", async () => {
                 clearTimeout(tiempoActual);
                 jugoJ2 = true;
                 let palo = document.getElementById('paloj2');
@@ -475,7 +515,7 @@ const imprimirCartas = () => {
                     if(!noJugoJ1()) {
                         jug1 = obtenerJugador1LocalStorage();
                         const cartaJ1 = jug1.jugada;
-                        compararValores(cartaJ1, CartaJ2);
+                        await compararValores(cartaJ1, CartaJ2);
                         vaciarCartasJugadas(reiniciarCartasJugadas);
                     }
                     imprimirCartas();
