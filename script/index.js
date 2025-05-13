@@ -189,7 +189,7 @@ const barajarRepartir = () => {
         repartirCarta(jug1);
     }
     actualizarLocalStorage(jug1, jug2);
-    return 0;
+    return;
 }
 
 const cambioMano = () => {
@@ -263,6 +263,18 @@ const noHayCartaJugadaJ2 = () => {
     } else return false;
 }
 
+const vaciarReglas = () => {
+    const reglas = document.querySelector("body .mesa-juego .cartas .reglas");
+    reglas.innerHTML = ``;
+}
+
+const vaciarCartas = () => {
+    const contenedor1 = document.querySelector(".mesa-juego .cartas .jugadores .jugador1");
+    contenedor1.innerHTML = ``;
+    const contenedor2 = document.querySelector(".mesa-juego .cartas .jugadores .jugador2");
+    contenedor2.innerHTML = ``;
+}
+
 const actualizarCartaJugadaJ1 = (palo, numero) => {
     const carta = new Carta(palo, numero);
     let jug1 = obtenerJugador1LocalStorage();
@@ -273,6 +285,7 @@ const actualizarCartaJugadaJ1 = (palo, numero) => {
     paloJugada.innerText = palo;
     numeroJugada.innerText = numero;
     actualizarLocalStorage(jug1, jug2);
+    eliminarCarta(carta, vaciarCartas);
 }
 
 const actualizarCartaJugadaJ2 = (palo, numero) => {
@@ -285,18 +298,7 @@ const actualizarCartaJugadaJ2 = (palo, numero) => {
     paloJugada.innerText = palo;
     numeroJugada.innerText = numero;
     actualizarLocalStorage(jug1, jug2);
-}
-
-const vaciarReglas = () => {
-    const reglas = document.querySelector("body .mesa-juego .cartas .reglas");
-    reglas.innerHTML = ``;
-}
-
-const vaciarCartas = () => {
-    const contenedor1 = document.querySelector(".mesa-juego .cartas .jugadores .jugador1");
-    contenedor1.innerHTML = ``;
-    const contenedor2 = document.querySelector(".mesa-juego .cartas .jugadores .jugador2");
-    contenedor2.innerHTML = ``;
+    eliminarCarta(carta, vaciarCartas);
 }
 
 const actualizarPuntuacion = () => {
@@ -376,6 +378,17 @@ const hayCartasEnJuego = () => {
     }   else return false;
 }
 
+const mostrarGanador = () => {
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    const marcador = document.getElementById('puntos');
+    if (jugadorGano(jug2)) {
+        marcador.innerText = `Ganó ${jug2.nick}, fin del partido.`
+    } else {
+        marcador.innerText = `Ganó ${jug1.nick}, fin del partido.`
+    }
+}
+
 const jugadorGano = (jugador) => {
     if(jugador.puntosPartido == 2) {
         return true;
@@ -384,9 +397,23 @@ const jugadorGano = (jugador) => {
     }
 }
 
+const partidoTerminado = () => {
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    return (jugadorGano(jug1) || jugadorGano(jug2));
+}
+
 let tiempoActual;
 
+const cancelarTimeoutPerdido = () => {
+    if (tiempoActual !== null) {
+        clearTimeout(tiempoActual);
+        tiempoActual = null;
+    }
+} 
+
 const imprimirCartas = () => {
+    cancelarTimeoutPerdido();
     actualizarPuntuacion();
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
@@ -396,27 +423,32 @@ const imprimirCartas = () => {
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
         let jugoJ1 = false;
-        if(jugadorGano(jug2) || jugadorGano(jug1)) {
-            if (jugadorGano(jug2)) {
-                const marcador = document.getElementById('puntos');
-                marcador.innerText = `Ganó ${jug2.nick}, fin del partido.`
-                return 0;
-            } else {
-                const marcador = document.getElementById('puntos');
-                marcador.innerText = `Ganó ${jug1.nick}, fin del partido.`
-                return 0;
-            }
+        if(partidoTerminado()) {
+            mostrarGanador();
+            return;
         } else {
             tiempoActual = setTimeout(() => {
                 if(!jugoJ1) {
+                    if(partidoTerminado()) {
+                        return;
+                    }
                     vaciarCartasJugadas(reiniciarCartasJugadas);
                     vaciarCartasMesa();
                     jug2.cartas = [];
                     jug1.cartas = [];
-                    reiniciarPtosMano();
                     jug2.puntosPartido++;
                     actualizarLocalStorage(jug1, jug2);
-                    imprimirCartas();
+                    reiniciarPtosMano();
+                    jug1 = obtenerJugador1LocalStorage();
+                    jug2 = obtenerJugador2LocalStorage();
+                    if(!partidoTerminado()) {
+                        barajarRepartir();
+                        imprimirCartas();
+                        return;
+                    } else {
+                        mostrarGanador();
+                        return;
+                    }
                 }
             }, 10000);
         }
@@ -439,51 +471,48 @@ const imprimirCartas = () => {
             boton.addEventListener("click", async () => {
                 clearTimeout(tiempoActual);
                 jugoJ1 = true;
-                let palo = document.getElementById('paloj1');
-                let numero = document.getElementById('numeroj1');
                 if(noHayCartaJugadaJ1()) {
-                    palo.innerText = carta.palo;
-                    numero.innerText = carta.numero;
-                    const CartaJ1 = new Carta(palo.innerText, parseInt(numero.innerText));
-                    jug1.jugada = CartaJ1;
-                    actualizarLocalStorage(jug1, jug2);
-                    eliminarCarta(CartaJ1, vaciarCartas);
+                    actualizarCartaJugadaJ1(carta.palo, carta.numero);
                     if(!noJugoJ2()) {
+                        jug1 = obtenerJugador1LocalStorage();
                         jug2 = obtenerJugador2LocalStorage();
-                        const CartaJ2 = jug2.jugada;
-                        await compararValores(CartaJ1, CartaJ2);
+                        await compararValores(jug1.jugada, jug2.jugada);
                         vaciarCartasJugadas(reiniciarCartasJugadas);
                     }
                     imprimirCartas();
+                    return;
                 }
             });
         });
     } else {
-        cambioMano()
+        cambioMano();
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
         let jugoJ2 = false;
         vaciarCartasMesaJ1();
-        if(jugadorGano(jug2) || jugadorGano(jug1)) {
-            if (jugadorGano(jug2)) {
-                const marcador = document.getElementById('puntos');
-                marcador.innerText = `Ganó ${jug2.nick}, fin del partido.`
-                return 0;
-            } else {
-                const marcador = document.getElementById('puntos');
-                marcador.innerText = `Ganó ${jug1.nick}, fin del partido.`
-                return 0;
-            }
+        if(partidoTerminado()) {
+            mostrarGanador();
+            return;
         } else {
             tiempoActual = setTimeout(() => {
                 if(!jugoJ2) {
+                    if(partidoTerminado()) {
+                        return;
+                    }
                     vaciarCartasJugadas(reiniciarCartasJugadas);
                     vaciarCartasMesaJ2();
                     jug2.cartas = [];
                     jug1.cartas = [];
                     jug1.puntosPartido++;
                     actualizarLocalStorage(jug1, jug2);
-                    imprimirCartas();                
+                    if(!partidoTerminado()) {
+                        barajarRepartir();
+                        imprimirCartas();
+                        return;
+                    } else {
+                        mostrarGanador();
+                        return;
+                    }             
                 }
             }, 10000);
         }
@@ -503,22 +532,16 @@ const imprimirCartas = () => {
             boton.addEventListener("click", async () => {
                 clearTimeout(tiempoActual);
                 jugoJ2 = true;
-                let palo = document.getElementById('paloj2');
-                let numero = document.getElementById('numeroj2');
-                if(palo.innerText == "" && numero.innerText == "") {
-                    palo.innerText = carta.palo;
-                    numero.innerText = carta.numero;
-                    const CartaJ2 = new Carta(palo.innerText, parseInt(numero.innerText));
-                    jug2.jugada = CartaJ2;
-                    actualizarLocalStorage(jug1, jug2);
-                    eliminarCarta(CartaJ2, vaciarCartas);
+                if(noHayCartaJugadaJ2()) {
+                    actualizarCartaJugadaJ2(carta.palo, carta.numero);
                     if(!noJugoJ1()) {
                         jug1 = obtenerJugador1LocalStorage();
-                        const cartaJ1 = jug1.jugada;
-                        await compararValores(cartaJ1, CartaJ2);
+                        jug2 = obtenerJugador2LocalStorage();
+                        await compararValores(jug1.jugada, jug2.jugada);
                         vaciarCartasJugadas(reiniciarCartasJugadas);
                     }
                     imprimirCartas();
+                    return;
                 }
             });
         });
@@ -526,13 +549,13 @@ const imprimirCartas = () => {
     if(jug1.cartas.length === 0 && jug2.cartas.length === 0) {
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
-        if(!jugadorGano(jug1) && !jugadorGano(jug2)) {
-            if(jug1.puntosMano >= 2) {
+        if(!partidoTerminado()) {
+            if(jug1.puntosMano >= 2 && (jug1.puntosMano + jug2.puntosMano === 3)) {
                 jug1.puntosPartido++;
                 actualizarLocalStorage(jug1, jug2);
                 reiniciarPtosMano();
                 actualizarPuntuacion();
-            } else if(jug2.puntosMano >= 2) {
+            } else if(jug2.puntosMano >= 2 && (jug1.puntosMano + jug2.puntosMano === 3)) {
                 jug2.puntosPartido++
                 actualizarLocalStorage(jug1, jug2);
                 reiniciarPtosMano();
@@ -540,16 +563,13 @@ const imprimirCartas = () => {
             }
             jug1 = obtenerJugador1LocalStorage();
             jug2 = obtenerJugador2LocalStorage();
-            if(!jugadorGano(jug1) && !jugadorGano(jug2)) {
+            if(!partidoTerminado()) {
                 barajarRepartir();
                 imprimirCartas();
+                return;
             } else {
-                const marcador = document.getElementById('puntos');
-                if(jugadorGano(jug1)) {
-                    marcador.innerText = `Ganó ${jug1.nick}, fin del partido.`
-                } else {
-                    marcador.innerText = `Ganó ${jug2.nick}, fin del partido.`
-                }
+                mostrarGanador();
+                return;
             }
         }
     }
