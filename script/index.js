@@ -217,13 +217,21 @@ const compararValores = async (cartaj1, cartaj2) => {
         if(jug1.mano) {
             if(valorJ1 <= valorJ2) {
                 jug2.puntosMano++;
+                jug1.mano = true;
+                jug2.mano = false;
             } else {
                 jug1.puntosMano++;
+                jug1.mano = false;
+                jug2.mano = true;
             }
         } else if(valorJ1 < valorJ2) {
                 jug2.puntosMano++;
+                jug1.mano = true;
+                jug2.mano = false;
             } else {
                 jug1.puntosMano++;
+                jug1.mano = false;
+                jug2.mano = true;
             }
     actualizarLocalStorage(jug1, jug2);
     } catch(err) {
@@ -419,7 +427,6 @@ const imprimirCartas = () => {
     let jug2 = obtenerJugador2LocalStorage();
     if(jug2.mano) {
         vaciarCartasMesaJ2();
-        cambioMano();
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
         let jugoJ1 = false;
@@ -478,6 +485,8 @@ const imprimirCartas = () => {
                         jug2 = obtenerJugador2LocalStorage();
                         await compararValores(jug1.jugada, jug2.jugada);
                         vaciarCartasJugadas(reiniciarCartasJugadas);
+                    } else {
+                        cambioMano();
                     }
                     imprimirCartas();
                     return;
@@ -485,7 +494,6 @@ const imprimirCartas = () => {
             });
         });
     } else {
-        cambioMano();
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
         let jugoJ2 = false;
@@ -539,6 +547,8 @@ const imprimirCartas = () => {
                         jug2 = obtenerJugador2LocalStorage();
                         await compararValores(jug1.jugada, jug2.jugada);
                         vaciarCartasJugadas(reiniciarCartasJugadas);
+                    } else {
+                        cambioMano();
                     }
                     imprimirCartas();
                     return;
@@ -588,6 +598,7 @@ reanudar.addEventListener("click", function(event) {
     event.preventDefault();
     if(!hayCartasEnJuego()) {
         vaciarReglas();
+        actualizarPuntuacion();
         imprimirCartas();
         let jug1 = obtenerJugador1LocalStorage();
         let jug2 = obtenerJugador2LocalStorage();
@@ -616,7 +627,9 @@ boton.addEventListener("click", function(event){
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
     if(jug2.cartas.length > 0 || jug1.cartas.length > 0 || jug1.puntosPartido > 0 || jug2.puntosPartido > 0) {
-        alerta.innerText = "Hay una partida en juego, reinicie memoria o reanude."
+        if(!partidoTerminado()) {
+            alerta.innerText = "Hay una partida en juego, reinicie memoria o reanude."
+        } else jugarPartido();
     } else if(nickJ1.value !== "" && nickJ2.value !== "") {
         vaciarReglas();
         if (!localStorage.getItem('player1')) {
