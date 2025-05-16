@@ -669,7 +669,7 @@ boton.addEventListener("click", function(event){
                 draggable: true
             });
         } else jugarPartido();
-    } else if(nickJ1.value !== "" || nickJ2.value !== "") {
+    } else if(nickJ1.value !== "" && nickJ2.value !== "") {
         vaciarReglas();
         if (!localStorage.getItem('player1')) {
             localStorage.setItem('player1', JSON.stringify(jugador1));
