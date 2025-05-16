@@ -389,11 +389,20 @@ const hayCartasEnJuego = () => {
 const mostrarGanador = () => {
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
-    const marcador = document.getElementById('puntos');
     if (jugadorGano(jug2)) {
-        marcador.innerText = `Ganó ${jug2.nick}, fin del partido.`
+        Swal.fire({
+            title: "Drag me!",
+            icon: "success",
+            text: `Ganó ${jug2.nick}, fin del partido.`,
+            draggable: true
+        });
     } else {
-        marcador.innerText = `Ganó ${jug1.nick}, fin del partido.`
+        Swal.fire({
+            title: "Fin del partido.",
+            icon: "success",
+            text: `Ganó ${jug1.nick}.`,
+            draggable: true
+        });
     }
 }
 
@@ -623,14 +632,18 @@ boton.addEventListener("click", function(event){
     event.preventDefault();
     let nickJ1 = document.getElementById('nombreJ1');
     let nickJ2 = document.getElementById('nombreJ2');
-    const alerta = document.getElementById('puntos');
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
     if(jug2.cartas.length > 0 || jug1.cartas.length > 0 || jug1.puntosPartido > 0 || jug2.puntosPartido > 0) {
         if(!partidoTerminado()) {
-            alerta.innerText = "Hay una partida en juego, reinicie memoria o reanude."
+            Swal.fire({
+                title: "Atencion:",
+                icon: "info",
+                text: `Hay un partido en juego, reinicie o reanude.`,
+                draggable: true
+            });
         } else jugarPartido();
-    } else if(nickJ1.value !== "" && nickJ2.value !== "") {
+    } else if(nickJ1.value !== "" || nickJ2.value !== "") {
         vaciarReglas();
         if (!localStorage.getItem('player1')) {
             localStorage.setItem('player1', JSON.stringify(jugador1));
@@ -643,7 +656,12 @@ boton.addEventListener("click", function(event){
         actualizarLocalStorage(jug1, jug2);
         jugarPartido();
     } else {
-        alerta.innerText = `Ingrese nombres para comenzar.`
+        Swal.fire({
+            title: "Fallo al comenzar.",
+            icon: "error",
+            text: `Ingrese ambos nombres para comenzar.`,
+            draggable: true
+        });
     }
 });
 
