@@ -7,6 +7,18 @@ class Carta {
     }
 }
 
+const Muestra = new Carta("", -1);
+
+const actualizarMuestraLocalStorage = (muestra) => {
+    localStorage.setItem('muestra', JSON.stringify(muestra));
+}
+
+const obtenerMuestraLocalStorage = () => {
+    return JSON.parse(localStorage.getItem('muestra'));
+}
+
+actualizarMuestraLocalStorage(Muestra);
+
 const jugador1 = {
     nick: "",
     puntosMano: 0,
@@ -88,16 +100,12 @@ const traduccionPaloInverso = (palo) => {
     switch (palo) {
         case 'Oro': 
             return 0;
-        break;
         case 'Copa': 
             return 1;
-        break;
         case 'Espada':
             return 2;
-        break;
         case 'Basto': 
             return 3;
-        break;
     }
 }
 
@@ -188,6 +196,9 @@ const barajarRepartir = () => {
         repartirCarta(jug2);
         repartirCarta(jug1);
     }
+    let muestra = obtenerMuestraLocalStorage();
+    muestra = getCombinacionValida();
+    actualizarMuestraLocalStorage(muestra);
     actualizarLocalStorage(jug1, jug2);
     return;
 }
@@ -209,11 +220,13 @@ const cambioMano = () => {
 const compararValores = async (cartaj1, cartaj2) => {
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
+    let muestra = obtenerMuestraLocalStorage();
+    let paloMuestra = traduccionPaloInverso(muestra.palo);
     try {
         let solicitud = await fetch("./db/data.json");
         let response = await solicitud.json();
-        const valorJ1 = response[traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)];
-        const valorJ2 = response[traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)];
+        const valorJ1 = response[paloMuestra][traduccionPaloInverso(cartaj1.palo)][traduccionNumero(cartaj1.numero)];
+        const valorJ2 = response[paloMuestra][traduccionPaloInverso(cartaj2.palo)][traduccionNumero(cartaj2.numero)];
         if(jug1.mano) {
             if(valorJ1 <= valorJ2) {
                 jug2.puntosMano++;
@@ -312,7 +325,12 @@ const actualizarCartaJugadaJ2 = (palo, numero) => {
 const actualizarPuntuacion = () => {
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
+    let muestra = obtenerMuestraLocalStorage();
     const puntuacion = document.getElementById('puntos');
+    const paloMuestra = document.getElementById('paloMuestra');
+    const numeroMuestra = document.getElementById('numeroMuestra');
+    paloMuestra.innerText = muestra.palo;
+    numeroMuestra.innerText = muestra.numero;
     puntuacion.innerText=`${jug1.nick}: ${jug1.puntosPartido} - ${jug2.nick}: ${jug2.puntosPartido}`;
 } 
 
@@ -326,9 +344,17 @@ const vaciarCartasMesaJ2 = () => {
     cartas.innerHTML = ``;
 }
 
+const vaciarMuestra = () => {
+    let paloMuestra = document.getElementById('paloMuestra');
+    let numeroMuestra = document.getElementById('numeroMuestra');
+    paloMuestra.innerText = `Muestra`;
+    numeroMuestra.innerText = ``;
+}
+
 const vaciarCartasMesa = () => {
     vaciarCartasMesaJ1();
     vaciarCartasMesaJ2();
+    vaciarMuestra();
 }
 
 const vaciarCartasJugadas = (fn) => {
