@@ -668,7 +668,10 @@ boton.addEventListener("click", function(event){
                 text: `Hay un partido en juego, reinicie o reanude.`,
                 draggable: true
             });
-        } else jugarPartido();
+        } else {
+            vaciarReglas();
+            jugarPartido();
+        }
     } else if(nickJ1.value !== "" && nickJ2.value !== "") {
         vaciarReglas();
         if (!localStorage.getItem('player1')) {
