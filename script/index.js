@@ -9,15 +9,13 @@ class Carta {
 
 const Muestra = new Carta("", -1);
 
-const actualizarMuestraLocalStorage = (muestra) => {
-    localStorage.setItem('muestra', JSON.stringify(muestra));
-}
-
 const obtenerMuestraLocalStorage = () => {
     return JSON.parse(localStorage.getItem('muestra'));
 }
 
-actualizarMuestraLocalStorage(Muestra);
+const actualizarMuestraLocalStorage = (muestra) => {
+    localStorage.setItem('muestra', JSON.stringify(muestra));
+}
 
 const jugador1 = {
     nick: "",
@@ -37,18 +35,29 @@ const jugador2 = {
     mano: false,
 };
 
-const reiniciarJugadores = (jug1, jug2) => {
+const reiniciarJugadores = () => {
+    let jug1 = obtenerJugador1LocalStorage();
     jug1.nick = "";
     jug1.puntosMano = 0;
     jug1.cartas = [];
     jug1.puntosPartido = 0;
     jug1.jugada = new Carta("", -1);
 
+    let jug2 = obtenerJugador2LocalStorage();
     jug2.nick = "";
     jug2.puntosMano = 0;
     jug2.cartas = [];
     jug2.puntosPartido = 0;
     jug2.jugada = new Carta("", -1);
+
+    actualizarLocalStorage(jug1, jug2);
+}
+
+const reiniciarMuestra = () => {
+    let muestra = obtenerMuestraLocalStorage();
+    muestra.palo = "";
+    muestra.numero = -1;
+    actualizarMuestraLocalStorage(muestra);
 }
 
 const reiniciarCartasJugadas = (jug1, jug2) => {
@@ -58,12 +67,20 @@ const reiniciarCartasJugadas = (jug1, jug2) => {
     jug2.jugada.numero = -1;
 }
 
-if (!localStorage.getItem('player1')) {
-    localStorage.setItem('player1', JSON.stringify(jugador1));
+const cargaLocalStorage = () => {
+    if(!localStorage.getItem('player1')) {
+        localStorage.setItem('player1', JSON.stringify(jugador1));
+    }
+    if(!localStorage.getItem('player2')) {
+        localStorage.setItem('player2', JSON.stringify(jugador2));
+    }
+    if(!localStorage.getItem('muestra')) {
+        localStorage.setItem('muestra', JSON.stringify(Muestra));
+    }
 }
-if (!localStorage.getItem('player2')) {
-    localStorage.setItem('player2', JSON.stringify(jugador2));
-}
+
+cargaLocalStorage();
+
 
 const actualizarLocalStorage = (player1, player2) => {
     localStorage.setItem('player1', JSON.stringify(player1));
@@ -329,8 +346,10 @@ const actualizarPuntuacion = () => {
     const puntuacion = document.getElementById('puntos');
     const paloMuestra = document.getElementById('paloMuestra');
     const numeroMuestra = document.getElementById('numeroMuestra');
-    paloMuestra.innerText = muestra.palo;
-    numeroMuestra.innerText = muestra.numero;
+    //if(!(muestra.palo === "") && !(muestra.numero === -1)) {
+        paloMuestra.innerText = muestra.palo;
+        numeroMuestra.innerText = muestra.numero;
+    //}
     puntuacion.innerText=`${jug1.nick}: ${jug1.puntosPartido} - ${jug2.nick}: ${jug2.puntosPartido}`;
 } 
 
@@ -430,6 +449,7 @@ const mostrarGanador = () => {
             draggable: true
         });
     }
+    vaciarMuestra();
 }
 
 const jugadorGano = (jugador) => {
@@ -467,6 +487,8 @@ const imprimirCartas = () => {
         let jugoJ1 = false;
         if(partidoTerminado()) {
             mostrarGanador();
+            reiniciarJugadores();
+            reiniciarMuestra();
             return;
         } else {
             tiempoActual = setTimeout(() => {
@@ -480,6 +502,7 @@ const imprimirCartas = () => {
                     jug1.cartas = [];
                     jug2.puntosPartido++;
                     actualizarLocalStorage(jug1, jug2);
+                    reiniciarMazo();
                     reiniciarPtosMano();
                     jug1 = obtenerJugador1LocalStorage();
                     jug2 = obtenerJugador2LocalStorage();
@@ -489,6 +512,8 @@ const imprimirCartas = () => {
                         return;
                     } else {
                         mostrarGanador();
+                        reiniciarJugadores();
+                        reiniciarMuestra();
                         return;
                     }
                 }
@@ -535,6 +560,8 @@ const imprimirCartas = () => {
         vaciarCartasMesaJ1();
         if(partidoTerminado()) {
             mostrarGanador();
+            reiniciarJugadores();
+            reiniciarMuestra();
             return;
         } else {
             tiempoActual = setTimeout(() => {
@@ -548,12 +575,15 @@ const imprimirCartas = () => {
                     jug1.cartas = [];
                     jug1.puntosPartido++;
                     actualizarLocalStorage(jug1, jug2);
+                    reiniciarMazo();
                     if(!partidoTerminado()) {
                         barajarRepartir();
                         imprimirCartas();
                         return;
                     } else {
                         mostrarGanador();
+                        reiniciarJugadores();
+                        reiniciarMuestra();
                         return;
                     }             
                 }
@@ -599,11 +629,13 @@ const imprimirCartas = () => {
                 jug1.puntosPartido++;
                 actualizarLocalStorage(jug1, jug2);
                 reiniciarPtosMano();
+                reiniciarMazo();
                 actualizarPuntuacion();
             } else if(jug2.puntosMano >= 2 && (jug1.puntosMano + jug2.puntosMano === 3)) {
                 jug2.puntosPartido++
                 actualizarLocalStorage(jug1, jug2);
                 reiniciarPtosMano();
+                reiniciarMazo();
                 actualizarPuntuacion();
             }
             jug1 = obtenerJugador1LocalStorage();
@@ -614,6 +646,8 @@ const imprimirCartas = () => {
                 return;
             } else {
                 mostrarGanador();
+                reiniciarJugadores();
+                reiniciarMuestra();
                 return;
             }
         }
@@ -633,8 +667,8 @@ reanudar.addEventListener("click", function(event) {
     event.preventDefault();
     if(!hayCartasEnJuego()) {
         vaciarReglas();
-        actualizarPuntuacion();
         imprimirCartas();
+        actualizarPuntuacion();
         let jug1 = obtenerJugador1LocalStorage();
         let jug2 = obtenerJugador2LocalStorage();
         if(!(jug1.jugada.numero === -1)) {
@@ -698,8 +732,6 @@ const reiniciar = document.getElementById('reinicio');
 reiniciar.addEventListener("click", function(){
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
-    localStorage.removeItem('player1');
-    localStorage.removeItem('player2');
     reiniciarJugadores(jug1, jug2);
     actualizarLocalStorage(jug1, jug2);
     const destinoJ1 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
