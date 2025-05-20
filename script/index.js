@@ -683,6 +683,13 @@ reanudar.addEventListener("click", function(event) {
             palo.innerText = jug2.jugada.palo;
             numero.innerText = jug2.jugada.numero;
         }
+        Swal.fire({
+            title: "Reanudando ...",
+            icon: "success",
+            showConfirmButton: false,
+            position: "top-end",
+            timer: 1000
+        });
     }
 });
 
@@ -699,8 +706,7 @@ boton.addEventListener("click", function(event){
             Swal.fire({
                 title: "Atencion:",
                 icon: "info",
-                text: `Hay un partido en juego, reinicie o reanude.`,
-                draggable: true
+                text: `Hay un partido en juego, reanude.`
             });
         } else {
             vaciarReglas();
@@ -722,22 +728,9 @@ boton.addEventListener("click", function(event){
         Swal.fire({
             title: "Fallo al comenzar.",
             icon: "error",
-            text: `Ingrese ambos nombres para comenzar.`,
-            draggable: true
+            text: `Ingrese ambos nombres para comenzar.`
         });
     }
 });
 
-const reiniciar = document.getElementById('reinicio');
-reiniciar.addEventListener("click", function(){
-    let jug1 = obtenerJugador1LocalStorage();
-    let jug2 = obtenerJugador2LocalStorage();
-    reiniciarJugadores(jug1, jug2);
-    actualizarLocalStorage(jug1, jug2);
-    const destinoJ1 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
-    const destinoJ2 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
-    destinoJ1.innerHTML = ``;
-    destinoJ2.innerHTML = ``;
-    vaciarCartasJugadas(reiniciarCartasJugadas);
-});
 
