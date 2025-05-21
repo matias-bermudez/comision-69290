@@ -35,6 +35,7 @@ const jugador2 = {
     mano: false,
 };
 
+
 const reiniciarJugadores = () => {
     let jug1 = obtenerJugador1LocalStorage();
     jug1.nick = "";
@@ -80,7 +81,6 @@ const cargarLocalStorage = () => {
 }
 
 cargarLocalStorage();
-
 
 const actualizarLocalStorage = (player1, player2) => {
     localStorage.setItem('player1', JSON.stringify(player1));
@@ -141,35 +141,6 @@ let mazo = [
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12],
             [1, 2, 3, 4, 5, 6, 7, 10, 11, 12]
             ];
-
-const reiniciarMazo = () => {
-    mazo.length = 0;
-    mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
-    mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
-    mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
-    mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
-}
-
-const reiniciarMano = (jugador1, jugador2) => {
-    jugador1.cartas.length = 0;
-    jugador2.cartas.length = 0;
-}
-
-const reiniciarPtosMano = () => {
-    let j1 = obtenerJugador1LocalStorage();
-    let j2 = obtenerJugador2LocalStorage();
-    j1.puntosMano = 0;
-    j2.puntosMano = 0;
-    actualizarLocalStorage(j1, j2);
-}
-
-const reiniciarPtosPartido = () => {
-    let j1 = obtenerJugador1LocalStorage();
-    let j2 = obtenerJugador2LocalStorage();
-    j1.puntosPartido = 0;
-    j2.puntosPartido = 0;
-    actualizarLocalStorage(j1, j2);
-}
 
 //Retorna valor del 0 al 3. (4 posibles palos) 
 const getPaloRandom = () => {
@@ -301,18 +272,6 @@ const noHayCartaJugadaJ2 = () => {
     } else return false;
 }
 
-const vaciarReglas = () => {
-    const reglas = document.querySelector("body .mesa-juego .cartas .reglas");
-    reglas.innerHTML = ``;
-}
-
-const vaciarCartas = () => {
-    const contenedor1 = document.querySelector(".mesa-juego .cartas .jugadores .jugador1");
-    contenedor1.innerHTML = ``;
-    const contenedor2 = document.querySelector(".mesa-juego .cartas .jugadores .jugador2");
-    contenedor2.innerHTML = ``;
-}
-
 const actualizarCartaJugadaJ1 = (palo, numero) => {
     const carta = new Carta(palo, numero);
     let jug1 = obtenerJugador1LocalStorage();
@@ -346,10 +305,8 @@ const actualizarPuntuacion = () => {
     const puntuacion = document.getElementById('puntos');
     const paloMuestra = document.getElementById('paloMuestra');
     const numeroMuestra = document.getElementById('numeroMuestra');
-    //if(!(muestra.palo === "") && !(muestra.numero === -1)) {
-        paloMuestra.innerText = muestra.palo;
-        numeroMuestra.innerText = muestra.numero;
-    //}
+    paloMuestra.innerText = muestra.palo;
+    numeroMuestra.innerText = muestra.numero;
     puntuacion.innerText=`${jug1.nick}: ${jug1.puntosPartido} - ${jug2.nick}: ${jug2.puntosPartido}`;
 } 
 
@@ -455,6 +412,7 @@ const mostrarGanador = () => {
         });
     }
     vaciarMuestra();
+    vaciarPuntuacion();
 }
 
 const vaciarLocalStorage = () => {
@@ -708,7 +666,6 @@ reanudar.addEventListener("click", function(event) {
         });
     }
 });
-
 
 let boton = document.getElementById('boton');
 boton.addEventListener("click", function(event){
