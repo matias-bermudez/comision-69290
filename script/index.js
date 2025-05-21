@@ -308,34 +308,6 @@ const actualizarPuntuacion = () => {
     puntuacion.innerText=`${jug1.nick}: ${jug1.puntosPartido} - ${jug2.nick}: ${jug2.puntosPartido}`;
 } 
 
-const vaciarCartasMesaJ1 = () => {
-    const cartas = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
-    cartas.innerHTML = ``;
-}
-
-const vaciarPuntuacion = () => {
-    const puntuacion = document.getElementById('puntos');
-    puntuacion.innerHTML = `0 - 0`;
-}
-
-const vaciarCartasMesaJ2 = () => {
-    const cartas = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
-    cartas.innerHTML = ``;
-}
-
-const vaciarMuestra = () => {
-    let paloMuestra = document.getElementById('paloMuestra');
-    let numeroMuestra = document.getElementById('numeroMuestra');
-    paloMuestra.innerText = `Muestra`;
-    numeroMuestra.innerText = ``;
-}
-
-const vaciarCartasMesa = () => {
-    vaciarCartasMesaJ1();
-    vaciarCartasMesaJ2();
-    vaciarMuestra();
-}
-
 const vaciarCartasJugadas = (fn) => {
     const paloj1 = document.getElementById('paloj1');
     paloj1.textContent = "";

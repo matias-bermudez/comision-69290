@@ -10,6 +10,34 @@ const vaciarCartas = () => {
     contenedor2.innerHTML = ``;
 }
 
+const vaciarCartasMesaJ1 = () => {
+    const cartas = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
+    cartas.innerHTML = ``;
+}
+
+const vaciarPuntuacion = () => {
+    const puntuacion = document.getElementById('puntos');
+    puntuacion.innerHTML = `0 - 0`;
+}
+
+const vaciarCartasMesaJ2 = () => {
+    const cartas = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
+    cartas.innerHTML = ``;
+}
+
+const vaciarMuestra = () => {
+    let paloMuestra = document.getElementById('paloMuestra');
+    let numeroMuestra = document.getElementById('numeroMuestra');
+    paloMuestra.innerText = `Muestra`;
+    numeroMuestra.innerText = ``;
+}
+
+const vaciarCartasMesa = () => {
+    vaciarCartasMesaJ1();
+    vaciarCartasMesaJ2();
+    vaciarMuestra();
+}
+
 const reiniciarMazo = () => {
     mazo.length = 0;
     mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
