@@ -68,10 +68,13 @@ const compararValores = async (cartaj1, cartaj2) => {
             }
     actualizarLocalStorage(jug1, jug2);
     } catch(err) {
-        //
-    } finally {
-        //
-    }
+        Swal.fire({
+            title: "Lo sentimos...",
+            icon: "error",
+            text: `Imposible consultar valores, intente denuevo mas tarde.`,
+            draggable: true
+        });
+    } 
 }
 
 const actualizarCartaJugadaJ1 = (palo, numero) => {
@@ -152,7 +155,7 @@ const mostrarGanador = () => {
     let jug2 = obtenerJugador2LocalStorage();
     if (jugadorGano(jug2)) {
         Swal.fire({
-            title: "Drag me!",
+            title: "Fin del partido.",
             icon: "success",
             text: `Ganó ${jug2.nick}, fin del partido.`,
             draggable: true
