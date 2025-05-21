@@ -6,8 +6,8 @@ const vaciarReglas = () => {
 
 const vaciarCartas = () => {
     const contenedor1 = document.querySelector(".mesa-juego .cartas .jugadores .jugador1");
-    contenedor1.innerHTML = ``;
     const contenedor2 = document.querySelector(".mesa-juego .cartas .jugadores .jugador2");
+    contenedor1.innerHTML = ``;
     contenedor2.innerHTML = ``;
 }
 
@@ -64,11 +64,11 @@ const reiniciarMazo = () => {
 }
 
 const reiniciarPtosMano = () => {
-    let j1 = obtenerJugador1LocalStorage();
-    let j2 = obtenerJugador2LocalStorage();
-    j1.puntosMano = 0;
-    j2.puntosMano = 0;
-    actualizarLocalStorage(j1, j2);
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    jug1.puntosMano = 0;
+    jug2.puntosMano = 0;
+    actualizarLocalStorage(jug1, jug2);
 }
 
 const reiniciarMano = () => {
@@ -82,16 +82,16 @@ const reiniciarMano = () => {
 
 const reiniciarJugadores = () => {
     let jug1 = obtenerJugador1LocalStorage();
-    jug1.nick = "";
-    jug1.puntosMano = 0;
-    jug1.cartas = [];
-    jug1.puntosPartido = 0;
-    jug1.jugada = new Carta("", -1);
     let jug2 = obtenerJugador2LocalStorage();
+    jug1.nick = "";
     jug2.nick = "";
+    jug1.puntosMano = 0;
     jug2.puntosMano = 0;
+    jug1.cartas = [];
     jug2.cartas = [];
+    jug1.puntosPartido = 0;
     jug2.puntosPartido = 0;
+    jug1.jugada = new Carta("", -1);
     jug2.jugada = new Carta("", -1);
     actualizarLocalStorage(jug1, jug2);
 }
@@ -105,9 +105,9 @@ const reiniciarMuestra = () => {
 
 const reiniciarCartasJugadas = (jug1, jug2) => {
     jug1.jugada.palo = "";
-    jug1.jugada.numero = -1;
     jug2.jugada.palo = "";
     jug2.jugada.numero = -1;
+    jug1.jugada.numero = -1;
 }
 
 const reiniciarPtosPartido = () => {
