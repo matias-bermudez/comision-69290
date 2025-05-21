@@ -35,6 +35,39 @@ const jugador2 = {
     mano: false,
 };
 
+
+const reiniciarJugadores = () => {
+    let jug1 = obtenerJugador1LocalStorage();
+    jug1.nick = "";
+    jug1.puntosMano = 0;
+    jug1.cartas = [];
+    jug1.puntosPartido = 0;
+    jug1.jugada = new Carta("", -1);
+
+    let jug2 = obtenerJugador2LocalStorage();
+    jug2.nick = "";
+    jug2.puntosMano = 0;
+    jug2.cartas = [];
+    jug2.puntosPartido = 0;
+    jug2.jugada = new Carta("", -1);
+
+    actualizarLocalStorage(jug1, jug2);
+}
+
+const reiniciarMuestra = () => {
+    let muestra = obtenerMuestraLocalStorage();
+    muestra.palo = "";
+    muestra.numero = -1;
+    actualizarMuestraLocalStorage(muestra);
+}
+
+const reiniciarCartasJugadas = (jug1, jug2) => {
+    jug1.jugada.palo = "";
+    jug1.jugada.numero = -1;
+    jug2.jugada.palo = "";
+    jug2.jugada.numero = -1;
+}
+
 const cargarLocalStorage = () => {
     if(!localStorage.getItem('player1')) {
         localStorage.setItem('player1', JSON.stringify(jugador1));
@@ -277,6 +310,50 @@ const actualizarPuntuacion = () => {
     puntuacion.innerText=`${jug1.nick}: ${jug1.puntosPartido} - ${jug2.nick}: ${jug2.puntosPartido}`;
 } 
 
+const vaciarCartasMesaJ1 = () => {
+    const cartas = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
+    cartas.innerHTML = ``;
+}
+
+const vaciarPuntuacion = () => {
+    const puntuacion = document.getElementById('puntos');
+    puntuacion.innerHTML = `0 - 0`;
+}
+
+const vaciarCartasMesaJ2 = () => {
+    const cartas = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
+    cartas.innerHTML = ``;
+}
+
+const vaciarMuestra = () => {
+    let paloMuestra = document.getElementById('paloMuestra');
+    let numeroMuestra = document.getElementById('numeroMuestra');
+    paloMuestra.innerText = `Muestra`;
+    numeroMuestra.innerText = ``;
+}
+
+const vaciarCartasMesa = () => {
+    vaciarCartasMesaJ1();
+    vaciarCartasMesaJ2();
+    vaciarMuestra();
+}
+
+const vaciarCartasJugadas = (fn) => {
+    const paloj1 = document.getElementById('paloj1');
+    paloj1.textContent = "";
+    const numeroj1 = document.getElementById('numeroj1');
+    numeroj1.textContent = "";
+
+    const paloj2 = document.getElementById('paloj2');
+    paloj2.textContent = "";
+    const numeroj2 = document.getElementById('numeroj2');
+    numeroj2.textContent = "";
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage()
+    fn(jug1, jug2);
+    actualizarLocalStorage(jug1, jug2);
+}
+
 const eliminarCarta = (carta, fn) => {
     let contador = 0;
     let id = -1;
@@ -338,6 +415,24 @@ const mostrarGanador = () => {
     vaciarPuntuacion();
 }
 
+const vaciarLocalStorage = () => {
+    localStorage.removeItem('muestra');
+    localStorage.removeItem('player1');
+    localStorage.removeItem('player2');
+}
+
+const finPartido = () => {
+    clearTimeout(tiempoActual);
+    mostrarGanador();
+    vaciarPuntuacion();
+    reiniciarJugadores();
+    reiniciarMuestra();
+    localStorage.removeItem('muestra');
+    localStorage.removeItem('player1');
+    localStorage.removeItem('player2');
+    return;
+}
+
 const jugadorGano = (jugador) => {
     if(jugador.puntosPartido == 2) {
         return true;
@@ -372,16 +467,11 @@ const imprimirCartas = () => {
         jug2 = obtenerJugador2LocalStorage();
         let jugoJ1 = false;
         if(partidoTerminado()) {
-            mostrarGanador();
-            reiniciarJugadores();
-            reiniciarMuestra();
+            finPartido();
             return;
         } else {
             tiempoActual = setTimeout(() => {
                 if(!jugoJ1) {
-                    if(partidoTerminado()) {
-                        return;
-                    }
                     vaciarCartasJugadas(reiniciarCartasJugadas);
                     vaciarCartasMesa();
                     jug2.cartas = [];
@@ -397,9 +487,7 @@ const imprimirCartas = () => {
                         imprimirCartas();
                         return;
                     } else {
-                        mostrarGanador();
-                        reiniciarJugadores();
-                        reiniciarMuestra();
+                        finPartido();
                         return;
                     }
                 }
@@ -445,16 +533,11 @@ const imprimirCartas = () => {
         let jugoJ2 = false;
         vaciarCartasMesaJ1();
         if(partidoTerminado()) {
-            mostrarGanador();
-            reiniciarJugadores();
-            reiniciarMuestra();
+            finPartido();
             return;
         } else {
             tiempoActual = setTimeout(() => {
                 if(!jugoJ2) {
-                    if(partidoTerminado()) {
-                        return;
-                    }
                     vaciarCartasJugadas(reiniciarCartasJugadas);
                     vaciarCartasMesaJ2();
                     jug2.cartas = [];
@@ -467,9 +550,7 @@ const imprimirCartas = () => {
                         imprimirCartas();
                         return;
                     } else {
-                        mostrarGanador();
-                        reiniciarJugadores();
-                        reiniciarMuestra();
+                        finPartido();
                         return;
                     }             
                 }
@@ -531,9 +612,7 @@ const imprimirCartas = () => {
                 imprimirCartas();
                 return;
             } else {
-                mostrarGanador();
-                reiniciarJugadores();
-                reiniciarMuestra();
+                finPartido();
                 return;
             }
         }
@@ -541,6 +620,7 @@ const imprimirCartas = () => {
 }
 
 const jugarPartido = () => {
+    cargarLocalStorage();
     reiniciarPtosMano();
     reiniciarPtosPartido();
     actualizarPuntuacion();
@@ -551,30 +631,38 @@ const jugarPartido = () => {
 const reanudar = document.getElementById('retomar');
 reanudar.addEventListener("click", function(event) {
     event.preventDefault();
-    if(!hayCartasEnJuego()) {
-        vaciarReglas();
-        imprimirCartas();
-        actualizarPuntuacion();
-        let jug1 = obtenerJugador1LocalStorage();
-        let jug2 = obtenerJugador2LocalStorage();
-        if(!(jug1.jugada.numero === -1)) {
-            let palo = document.getElementById('paloj1');
-            let numero = document.getElementById('numeroj1');
-            palo.innerText = jug1.jugada.palo;
-            numero.innerText = jug1.jugada.numero;
+    if(obtenerJugador1LocalStorage()) {
+        if(!hayCartasEnJuego()) {
+            vaciarReglas();
+            imprimirCartas();
+            actualizarPuntuacion();
+            let jug1 = obtenerJugador1LocalStorage();
+            let jug2 = obtenerJugador2LocalStorage();
+            if(!(jug1.jugada.numero === -1)) {
+                let palo = document.getElementById('paloj1');
+                let numero = document.getElementById('numeroj1');
+                palo.innerText = jug1.jugada.palo;
+                numero.innerText = jug1.jugada.numero;
+            }
+            if(!(jug2.jugada.numero === -1)) {
+                let palo = document.getElementById('paloj2');
+                let numero = document.getElementById('numeroj2');
+                palo.innerText = jug2.jugada.palo;
+                numero.innerText = jug2.jugada.numero;
+            }
+            Swal.fire({
+                title: "Reanudando ...",
+                icon: "success",
+                showConfirmButton: false,
+                position: "top-end",
+                timer: 1000
+            });
         }
-        if(!(jug2.jugada.numero === -1)) {
-            let palo = document.getElementById('paloj2');
-            let numero = document.getElementById('numeroj2');
-            palo.innerText = jug2.jugada.palo;
-            numero.innerText = jug2.jugada.numero;
-        }
+    } else {
         Swal.fire({
-            title: "Reanudando ...",
-            icon: "success",
-            showConfirmButton: false,
-            position: "top-end",
-            timer: 1000
+                title: "No hay partido en juego.",
+                icon: "error",
+                text: "Comienze uno nuevo"
         });
     }
 });
@@ -582,38 +670,30 @@ reanudar.addEventListener("click", function(event) {
 let boton = document.getElementById('boton');
 boton.addEventListener("click", function(event){
     event.preventDefault();
-    let nickJ1 = document.getElementById('nombreJ1');
-    let nickJ2 = document.getElementById('nombreJ2');
-    let jug1 = obtenerJugador1LocalStorage();
-    let jug2 = obtenerJugador2LocalStorage();
-    if(jug2.cartas.length > 0 || jug1.cartas.length > 0 || jug1.puntosPartido > 0 || jug2.puntosPartido > 0) {
-        if(!partidoTerminado()) {
-            Swal.fire({
-                title: "Atencion:",
-                icon: "info",
-                text: `Hay un partido en juego, reanude.`
-            });
-        } else {
+    if(!obtenerJugador1LocalStorage() && !obtenerJugador2LocalStorage()) {
+        cargarLocalStorage();
+        let nickJ1 = document.getElementById('nombreJ1');
+        let nickJ2 = document.getElementById('nombreJ2');
+        let jug1 = obtenerJugador1LocalStorage();
+        let jug2 = obtenerJugador2LocalStorage();
+        if(nickJ1.value !== "" && nickJ2.value !== "") {
             vaciarReglas();
+            jug1.nick = nickJ1.value;
+            jug2.nick = nickJ2.value;
+            actualizarLocalStorage(jug1, jug2);
             jugarPartido();
+        } else {
+            Swal.fire({
+                title: "Fallo al comenzar.",
+                icon: "error",
+                text: `Ingrese ambos nombres para comenzar.`
+            });
         }
-    } else if(nickJ1.value !== "" && nickJ2.value !== "") {
-        vaciarReglas();
-        if (!localStorage.getItem('player1')) {
-            localStorage.setItem('player1', JSON.stringify(jugador1));
-        }
-        if (!localStorage.getItem('player2')) {
-            localStorage.setItem('player2', JSON.stringify(jugador2));
-        }
-        jug1.nick = nickJ1.value;
-        jug2.nick = nickJ2.value;
-        actualizarLocalStorage(jug1, jug2);
-        jugarPartido();
     } else {
         Swal.fire({
-            title: "Fallo al comenzar.",
-            icon: "error",
-            text: `Ingrese ambos nombres para comenzar.`
+            title: "Atencion:",
+            icon: "info",
+            text: `Hay una partida en juego, reanude en caso de no ver las cartas.`
         });
     }
 });
