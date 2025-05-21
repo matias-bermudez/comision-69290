@@ -63,17 +63,21 @@ const reiniciarMazo = () => {
     mazo.push([1, 2, 3, 4, 5, 6, 7, 10, 11, 12]);
 }
 
-const reiniciarMano = (jugador1, jugador2) => {
-    jugador1.cartas.length = 0;
-    jugador2.cartas.length = 0;
-}
-
 const reiniciarPtosMano = () => {
     let j1 = obtenerJugador1LocalStorage();
     let j2 = obtenerJugador2LocalStorage();
     j1.puntosMano = 0;
     j2.puntosMano = 0;
     actualizarLocalStorage(j1, j2);
+}
+
+const reiniciarMano = () => {
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    jug1.cartas = [];
+    jug2.cartas = [];
+    actualizarLocalStorage(jug1, jug2);
+    reiniciarPtosMano();
 }
 
 const reiniciarJugadores = () => {

@@ -181,7 +181,15 @@ const finPartido = () => {
     return;
 }
 
-
+const finMano = () => {
+    clearTimeout(tiempoActual);
+    reiniciarMano();
+    vaciarCartasJugadas(reiniciarCartasJugadas);
+    vaciarCartasMesa();    
+    reiniciarMuestra();
+    reiniciarMazo();
+    actualizarPuntuacion();
+}
 
 let tiempoActual;
 
@@ -208,16 +216,9 @@ const imprimirCartas = () => {
         } else {
             tiempoActual = setTimeout(() => {
                 if(!jugoJ1) {
-                    vaciarCartasJugadas(reiniciarCartasJugadas);
-                    vaciarCartasMesa();
-                    jug2.cartas = [];
-                    jug1.cartas = [];
                     jug2.puntosPartido++;
                     actualizarLocalStorage(jug1, jug2);
-                    reiniciarMazo();
-                    reiniciarPtosMano();
-                    jug1 = obtenerJugador1LocalStorage();
-                    jug2 = obtenerJugador2LocalStorage();
+                    finMano();
                     if(!partidoTerminado()) {
                         barajarRepartir();
                         imprimirCartas();
@@ -274,13 +275,9 @@ const imprimirCartas = () => {
         } else {
             tiempoActual = setTimeout(() => {
                 if(!jugoJ2) {
-                    vaciarCartasJugadas(reiniciarCartasJugadas);
-                    vaciarCartasMesaJ2();
-                    jug2.cartas = [];
-                    jug1.cartas = [];
                     jug1.puntosPartido++;
                     actualizarLocalStorage(jug1, jug2);
-                    reiniciarMazo();
+                    finMano();
                     if(!partidoTerminado()) {
                         barajarRepartir();
                         imprimirCartas();
@@ -331,18 +328,14 @@ const imprimirCartas = () => {
             if(jug1.puntosMano >= 2 && (jug1.puntosMano + jug2.puntosMano === 3)) {
                 jug1.puntosPartido++;
                 actualizarLocalStorage(jug1, jug2);
-                reiniciarPtosMano();
-                reiniciarMazo();
+                finMano();
                 actualizarPuntuacion();
             } else if(jug2.puntosMano >= 2 && (jug1.puntosMano + jug2.puntosMano === 3)) {
                 jug2.puntosPartido++
                 actualizarLocalStorage(jug1, jug2);
-                reiniciarPtosMano();
-                reiniciarMazo();
+                finMano();
                 actualizarPuntuacion();
             }
-            jug1 = obtenerJugador1LocalStorage();
-            jug2 = obtenerJugador2LocalStorage();
             if(!partidoTerminado()) {
                 barajarRepartir();
                 imprimirCartas();
