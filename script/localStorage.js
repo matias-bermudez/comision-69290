@@ -10,6 +10,7 @@ class Carta {
 const Muestra = new Carta("", -1);
 
 const jugador1 = {
+    id: 1,
     nick: "",
     puntosMano: 0,
     cartas: [],
@@ -19,12 +20,18 @@ const jugador1 = {
 };
 
 const jugador2 = {
+    id: 2,
     nick: "",
     puntosMano: 0,
     cartas: [],
     puntosPartido: 0,
     jugada: new Carta("", -1),
     mano: false,
+};
+
+const Truco = {
+    valorMano: 1,
+    trucoCantado: false,
 };
 
 const cargarLocalStorage = () => {
@@ -37,11 +44,22 @@ const cargarLocalStorage = () => {
     if(!localStorage.getItem('muestra')) {
         localStorage.setItem('muestra', JSON.stringify(Muestra));
     }
+    if(!localStorage.getItem('infoTruco')) {
+        localStorage.setItem('infoTruco', JSON.stringify(Truco));
+    }
 }
 
 const actualizarLocalStorage = (player1, player2) => {
     localStorage.setItem('player1', JSON.stringify(player1));
     localStorage.setItem('player2', JSON.stringify(player2));
+}
+
+const actualizarMuestraLocalStorage = (muestra) => {
+    localStorage.setItem('muestra', JSON.stringify(muestra));
+}
+
+const actualizarInfoTrucoLocalStorage = (truco) => {
+    localStorage.setItem('infoTruco', JSON.stringify(truco));
 }
 
 const obtenerJugador1LocalStorage = () => {
@@ -56,12 +74,13 @@ const obtenerMuestraLocalStorage = () => {
     return JSON.parse(localStorage.getItem('muestra'));
 }
 
-const actualizarMuestraLocalStorage = (muestra) => {
-    localStorage.setItem('muestra', JSON.stringify(muestra));
+const obtenerInfoTrucoLocalStorage = () => {
+    return JSON.parse(localStorage.getItem('infoTruco'));
 }
 
 const vaciarLocalStorage = () => {
     localStorage.removeItem('muestra');
     localStorage.removeItem('player1');
     localStorage.removeItem('player2');
+    localStorage.removeItem('infoTruco');
 }

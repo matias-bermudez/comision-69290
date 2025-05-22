@@ -115,8 +115,6 @@ const actualizarPuntuacion = () => {
     puntuacion.innerText=`${jug1.nick}: ${jug1.puntosPartido} - ${jug2.nick}: ${jug2.puntosPartido}`;
 } 
 
-
-
 const eliminarCarta = (carta, fn) => {
     let contador = 0;
     let id = -1;
@@ -148,7 +146,133 @@ const eliminarCarta = (carta, fn) => {
     fn();
 }
 
+let tiempoTruco;
 
+const mostrarTruco = () => {
+    if(!Truco.trucoCantado) {
+        botonesTruco();
+    }
+}
+
+const botonesTruco = () => {
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    let truco = obtenerInfoTrucoLocalStorage();
+    if(!truco.trucoCantado) {
+        const boton = document.createElement("button");
+        boton.innerText = `Truco`;
+        boton.className = "boton-truco";
+        if(jug2.mano) {
+            const destinoJ1 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
+            destinoJ1.appendChild(boton);
+            boton.addEventListener("click", () => {
+                truco.trucoCantado = true;
+                actualizarInfoTrucoLocalStorage(truco);
+                vaciarCartasMesa();
+                tiempoTruco = setTimeout(() => {
+                    jug1.puntosPartido += truco.valorMano;
+                    actualizarLocalStorage(jug1, jug2);
+                    finMano();
+                    if(!partidoTerminado()) {
+                        barajarRepartir();
+                        imprimirCartas();
+                        return;
+                    } else {
+                        finPartido();
+                        return;
+                    }
+                }, 5000);
+                aceptarRechazarTruco(jug2.id);
+            });
+        } else {
+            const destinoJ2 = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
+            destinoJ2.appendChild(boton);
+            boton.addEventListener("click", () => {
+                truco.trucoCantado = true;
+                actualizarInfoTrucoLocalStorage(truco);
+                vaciarCartasMesa();
+                tiempoTruco = setTimeout(() => {
+                    jug2.puntosPartido += truco.valorMano;
+                    actualizarLocalStorage(jug1, jug2);
+                    finMano();
+                    if(!partidoTerminado()) {
+                        barajarRepartir();
+                        imprimirCartas();
+                        return;
+                    } else {
+                        finPartido();
+                        return;
+                    }
+                }, 5000);
+                aceptarRechazarTruco(jug1.id);
+            });
+        } 
+    }
+}
+
+//id es el id del jugador el cual tiene que aceptar o rechazar el truco.
+const aceptarRechazarTruco = (id) => {
+    let jug1 = obtenerJugador1LocalStorage();
+    let jug2 = obtenerJugador2LocalStorage();
+    let truco = obtenerInfoTrucoLocalStorage();
+    const botonQuiero = document.createElement("button");
+    const botonNoQuiero = document.createElement("button");
+    botonQuiero.innerText = `Quiero`;
+    botonNoQuiero.innerText = `No quiero`;
+    botonQuiero.className = "boton-truco";
+    botonNoQuiero.className = "boton-truco";
+    if(jug1.id === id) {
+        const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
+        destino.appendChild(botonNoQuiero);
+        destino.appendChild(botonQuiero);
+        botonQuiero.addEventListener("click", () => {
+            clearTimeout(tiempoTruco);
+            truco.valorMano = 2;
+            actualizarInfoTrucoLocalStorage(truco);
+            imprimirCartas();
+        });
+        botonNoQuiero.addEventListener("click", () => {
+            clearTimeout(tiempoTruco);
+            reiniciarTruco();
+            jug2.puntosPartido += truco.valorMano;
+            actualizarLocalStorage(jug1, jug2);
+            finMano();
+            if(!partidoTerminado()) {
+                barajarRepartir();
+                imprimirCartas();
+                return;
+            } else {
+                finPartido();
+                return;
+            }
+        });
+    } else {
+        const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
+        destino.appendChild(botonNoQuiero);
+        destino.appendChild(botonQuiero);
+        botonQuiero.addEventListener("click", () => {
+            clearTimeout(tiempoTruco);
+            truco.valorMano = 2;
+            actualizarInfoTrucoLocalStorage(truco);
+            imprimirCartas();
+        });
+        botonNoQuiero.addEventListener("click", () => {
+            truco = obtenerInfoTrucoLocalStorage();
+            clearTimeout(tiempoTruco);
+            jug1.puntosPartido += truco.valorMano;
+            actualizarLocalStorage(jug1, jug2);
+            finMano();
+            if(!partidoTerminado()) {
+                barajarRepartir();
+                imprimirCartas();
+                return;
+            } else {
+                finPartido();
+                return;
+            }
+        });
+    }
+}
 
 const mostrarGanador = () => {
     let jug1 = obtenerJugador1LocalStorage();
@@ -192,6 +316,7 @@ const finMano = () => {
     reiniciarMuestra();
     reiniciarMazo();
     actualizarPuntuacion();
+    reiniciarTruco();
 }
 
 let tiempoActual;
@@ -201,13 +326,14 @@ const cancelarTimeoutPerdido = () => {
         clearTimeout(tiempoActual);
         tiempoActual = null;
     }
-} 
+}
 
 const imprimirCartas = () => {
     cancelarTimeoutPerdido();
     actualizarPuntuacion();
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
+    let truco = obtenerInfoTrucoLocalStorage();
     if(jug2.mano) {
         vaciarCartasMesaJ2();
         jug1 = obtenerJugador1LocalStorage();
@@ -219,7 +345,7 @@ const imprimirCartas = () => {
         } else {
             tiempoActual = setTimeout(() => {
                 if(!jugoJ1) {
-                    jug2.puntosPartido++;
+                    jug2.puntosPartido += truco.valorMano;
                     actualizarLocalStorage(jug1, jug2);
                     finMano();
                     if(!partidoTerminado()) {
@@ -236,6 +362,7 @@ const imprimirCartas = () => {
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
         vaciarCartasMesaJ1();
+        mostrarTruco();
         jug1.cartas.forEach(carta => {
             const card = document.createElement("div");
             card.classList.add("carta");
@@ -267,9 +394,11 @@ const imprimirCartas = () => {
                 }
             });
         });
+        
     } else {
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
+        truco = obtenerInfoTrucoLocalStorage();
         let jugoJ2 = false;
         vaciarCartasMesaJ1();
         if(partidoTerminado()) {
@@ -278,7 +407,7 @@ const imprimirCartas = () => {
         } else {
             tiempoActual = setTimeout(() => {
                 if(!jugoJ2) {
-                    jug1.puntosPartido++;
+                    jug1.puntosPartido += truco.valorMano;
                     actualizarLocalStorage(jug1, jug2);
                     finMano();
                     if(!partidoTerminado()) {
@@ -292,6 +421,7 @@ const imprimirCartas = () => {
                 }
             }, 10000);
         }
+        mostrarTruco();
         jug2.cartas.forEach(carta => {
             const card = document.createElement("div");
             card.classList.add("carta");
@@ -327,14 +457,15 @@ const imprimirCartas = () => {
     if(jug1.cartas.length === 0 && jug2.cartas.length === 0) {
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
+        truco = obtenerInfoTrucoLocalStorage();
         if(!partidoTerminado()) {
             if(jug1.puntosMano >= 2 && (jug1.puntosMano + jug2.puntosMano === 3)) {
-                jug1.puntosPartido++;
+                jug1.puntosPartido += truco.valorMano;
                 actualizarLocalStorage(jug1, jug2);
                 finMano();
                 actualizarPuntuacion();
             } else if(jug2.puntosMano >= 2 && (jug1.puntosMano + jug2.puntosMano === 3)) {
-                jug2.puntosPartido++
+                jug2.puntosPartido += truco.valorMano;
                 actualizarLocalStorage(jug1, jug2);
                 finMano();
                 actualizarPuntuacion();

@@ -80,6 +80,13 @@ const reiniciarMano = () => {
     reiniciarPtosMano();
 }
 
+const reiniciarTruco = () => {
+    let truco = obtenerInfoTrucoLocalStorage();
+    truco.valorMano = 1;
+    truco.trucoCantado = false;
+    actualizarInfoTrucoLocalStorage(truco);
+}
+
 const reiniciarJugadores = () => {
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
@@ -232,7 +239,7 @@ const hayCartasEnJuego = () => {
 }
 
 const jugadorGano = (jugador) => {
-    if(jugador.puntosPartido == 2) {
+    if(jugador.puntosPartido >= 5) {
         return true;
     } else {
         return false;
