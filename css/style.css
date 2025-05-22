@@ -58,7 +58,7 @@ body h1 {
     font-size: 1.5rem;
 }
 
-.formulario form button, .formulario form input, .formulario button {
+.formulario form button, .formulario form input, .formulario button, .boton-truco {
     width: 140px;
     height: 30px;
     font-size: 1rem;
