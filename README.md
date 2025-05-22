@@ -8,8 +8,10 @@ The project was started on 7/4/2025 and it is not over.
 - Per hand, three card-to-card matches are will be played.
 - Per hand, there is a "muestra". This card has a number and a suit (**Espada**, **Basto**, **Oro**, **Copa**). The suit powers up some cards with the same suit.
 - The player that wins two of the three card-to-card matches, wins one point.
-- If a player wins two points, that player wins the match.
+- If a player wins five points, that player wins the match.
 - Each player has ten seconds to play their turn. If that player doesn't play, the opponent wins the point.
+- The value of a hand, can be changed with "Truco". One player proposes to increase the value of the point, if the other player accepts, the value of the hand is two, else, if the player doesn`t aceppt, he loses the hand.
+- Each player has five seconds to accept the "Truco", after the proposes of the other player
 
 ### Cards Value
 Given the trump suit, the ranking of the cards from the strongest to weakest (2 of the trump suit being the strongest and the 4 of any suit except the trump suit being the weakest):
@@ -55,8 +57,8 @@ El proyecto comenzó el 7/4/2025 y aún está en curso.
 - El primer jugador en ganar dos puntos, gana el partido.
 - Cada jugador tiene 10 segundos por turno.
 - No jugar en los 10 segundos de turno implica perder la mano.
-- No hay flor.
-- No hay envido.
+- El valor de una mano se puede cambiar con "Truco", un jugador propone aumentar el valor del punto, si el otro jugador acepta, el valor de la mano es dos, de lo contrario, si el jugador no acepta, pierde la mano.
+- El tiempo para aceptar el "Truco" son cinco segundos.
 
 ### Valor de las cartas
 Dada la muestra, la ponderacion de las cartas en orden de mayor a menor (2 de la muestra la mas fuerte, 4 sin ser de la muestra, la carta mas debil):
