@@ -296,6 +296,17 @@ const mostrarGanador = () => {
     vaciarPuntuacion();
 }
 
+const controlFinPartido = () => {
+    if(!partidoTerminado()) {
+        barajarRepartir();
+        imprimirCartas();
+        return;
+    } else {
+        finPartido();
+        return;
+    }
+}
+
 const finPartido = () => {
     clearTimeout(tiempoActual);
     mostrarGanador();
@@ -346,14 +357,8 @@ const imprimirCartas = () => {
                     jug2.puntosPartido += truco.valorMano;
                     actualizarLocalStorage(jug1, jug2);
                     finMano();
-                    if(!partidoTerminado()) {
-                        barajarRepartir();
-                        imprimirCartas();
-                        return;
-                    } else {
-                        finPartido();
-                        return;
-                    }
+                    controlFinPartido();
+                    return;
                 }
             }, 10000);
         }
@@ -408,14 +413,8 @@ const imprimirCartas = () => {
                     jug1.puntosPartido += truco.valorMano;
                     actualizarLocalStorage(jug1, jug2);
                     finMano();
-                    if(!partidoTerminado()) {
-                        barajarRepartir();
-                        imprimirCartas();
-                        return;
-                    } else {
-                        finPartido();
-                        return;
-                    }             
+                    controlFinPartido();
+                    return;            
                 }
             }, 10000);
         }
@@ -468,14 +467,8 @@ const imprimirCartas = () => {
                 finMano();
                 actualizarPuntuacion();
             }
-            if(!partidoTerminado()) {
-                barajarRepartir();
-                imprimirCartas();
-                return;
-            } else {
-                finPartido();
-                return;
-            }
+            controlFinPartido();
+            return;
         }
     }
 }
