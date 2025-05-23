@@ -521,8 +521,8 @@ reanudar.addEventListener("click", function(event) {
     }
 });
 
-let boton = document.getElementById('boton');
-boton.addEventListener("click", function(event){
+let form = document.getElementById('formularioComienzo');
+form.addEventListener("submit", function(event){
     event.preventDefault();
     if(!obtenerJugador1LocalStorage() && !obtenerJugador2LocalStorage()) {
         cargarLocalStorage();
