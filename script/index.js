@@ -302,9 +302,7 @@ const finPartido = () => {
     vaciarPuntuacion();
     reiniciarJugadores();
     reiniciarMuestra();
-    localStorage.removeItem('muestra');
-    localStorage.removeItem('player1');
-    localStorage.removeItem('player2');
+    vaciarLocalStorage();
     return;
 }
 
