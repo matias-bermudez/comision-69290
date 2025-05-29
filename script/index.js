@@ -154,6 +154,36 @@ const mostrarTruco = () => {
     }
 }
 
+const botonFoldear = () => {
+    const jug1 = obtenerJugador1LocalStorage();
+    const jug2 = obtenerJugador2LocalStorage();
+    const infoTruco = obtenerInfoTrucoLocalStorage();
+    const boton = document.createElement("button");
+    boton.className = "boton-fold";
+    boton.innerText = `Ir al Mazo`;
+    if(jug2.mano) {
+        const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador1");
+        destino.appendChild(boton);
+        boton.addEventListener("click", () => {
+            jug2.puntosPartido += infoTruco.valorMano;
+            actualizarLocalStorage(jug1, jug2);
+            cambioMano()
+            finMano();
+            controlFinPartido();
+        });
+    } else {
+        const destino = document.querySelector("body .mesa-juego .cartas .jugadores .jugador2");
+        destino.appendChild(boton);
+        boton.addEventListener("click", () => {
+            jug1.puntosPartido += infoTruco.valorMano;
+            actualizarLocalStorage(jug1, jug2);
+            cambioMano()
+            finMano();
+            controlFinPartido();
+        });
+    }
+}
+
 const botonesTruco = () => {
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
@@ -274,6 +304,11 @@ const aceptarRechazarTruco = (id) => {
     }
 }
 
+const mostrarBotones = () => {
+    botonFoldear();
+    mostrarTruco();
+}
+
 const mostrarGanador = () => {
     let jug1 = obtenerJugador1LocalStorage();
     let jug2 = obtenerJugador2LocalStorage();
@@ -365,7 +400,7 @@ const imprimirCartas = () => {
         jug1 = obtenerJugador1LocalStorage();
         jug2 = obtenerJugador2LocalStorage();
         vaciarCartasMesaJ1();
-        mostrarTruco();
+        mostrarBotones();
         jug1.cartas.forEach(carta => {
             const card = document.createElement("div");
             card.classList.add("carta");
@@ -418,7 +453,7 @@ const imprimirCartas = () => {
                 }
             }, 10000);
         }
-        mostrarTruco();
+        mostrarBotones();
         jug2.cartas.forEach(carta => {
             const card = document.createElement("div");
             card.classList.add("carta");
