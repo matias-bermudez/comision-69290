@@ -12,6 +12,7 @@ The project was started on 7/4/2025 and it is not over.
 - Each player has ten seconds to play their turn. If that player doesn't play, the opponent wins the point.
 - The value of a hand, can be changed with "Truco". One player proposes to increase the value of the point, if the other player accepts, the value of the hand is two, else, if the player doesn`t aceppt, he loses the hand.
 - Each player has five seconds to accept the "Truco", after the proposes of the other player
+- Both players can fold with the button "Ir al mazo" on each hand, losing the hand and giving the points to the opponent.
 
 ### Cards Value
 Given the trump suit, the ranking of the cards from the strongest to weakest (2 of the trump suit being the strongest and the 4 of any suit except the trump suit being the weakest):
@@ -59,6 +60,7 @@ El proyecto comenzó el 7/4/2025 y aún está en curso.
 - No jugar en los 10 segundos de turno implica perder la mano.
 - El valor de una mano se puede cambiar con "Truco", un jugador propone aumentar el valor del punto, si el otro jugador acepta, el valor de la mano es dos, de lo contrario, si el jugador no acepta, pierde la mano.
 - El tiempo para aceptar el "Truco" son cinco segundos.
+- Ambos jugadores pueden "Ir al mazo" en cada turno, perdiendo la mano y otorgando el valor de la mano en puntos al rival.
 
 ### Valor de las cartas
 Dada la muestra, la ponderacion de las cartas en orden de mayor a menor (2 de la muestra la mas fuerte, 4 sin ser de la muestra, la carta mas debil):
